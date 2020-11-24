@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.xmind.core.IRelationship;
 import org.xmind.core.ITopic;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.ui.actions.ISelectionAction;
 import org.xmind.gef.ui.actions.RequestAction;
 import org.xmind.gef.ui.editor.IGraphicalEditorPage;
@@ -66,8 +67,9 @@ public class ResetPositionAction extends RequestAction
 
     @Override
     public void run() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ResetPositionCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_MODIFY,
+                UserDataConstants.RESET_POSITION);
         super.run();
     }
 

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -146,9 +145,7 @@ public abstract class FloatingTextEditTool extends EditTool {
 
                                     Shell newShell = display.getActiveShell();
                                     if (newShell != null
-                                            && !newShell.isDisposed()
-                                            && !isDescendantShell(newShell,
-                                                    oldShell)) {
+                                            && !newShell.isDisposed()) {
                                         finishEditing();
                                     }
                                 }
@@ -158,16 +155,6 @@ public abstract class FloatingTextEditTool extends EditTool {
                 });
             }
         }
-
-        private boolean isDescendantShell(Shell newShell, Shell oldShell) {
-            Composite parent = newShell.getParent();
-            if (parent == null || !(parent instanceof Shell))
-                return false;
-            if (parent == oldShell)
-                return true;
-            return isDescendantShell((Shell) parent, oldShell);
-        }
-
     }
 
     private class EditorSelectionChangedListener
@@ -418,7 +405,9 @@ public abstract class FloatingTextEditTool extends EditTool {
 
             @Override
             public void run() {
-                restoreFocusControl();
+                if (focusOnRequest) {
+                    restoreFocusControl();
+                }
             }
         });
     }

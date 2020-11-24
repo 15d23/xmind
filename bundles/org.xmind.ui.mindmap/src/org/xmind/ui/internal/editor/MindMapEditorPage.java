@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -74,7 +74,6 @@ import org.xmind.ui.internal.actions.AlignmentRequestAction;
 import org.xmind.ui.internal.actions.CancelHyperlinkAction;
 import org.xmind.ui.internal.actions.CollapseAction;
 import org.xmind.ui.internal.actions.CollapseAllAction;
-import org.xmind.ui.internal.actions.CreateRelationshipAction;
 import org.xmind.ui.internal.actions.CreateSheetFromTopicAction;
 import org.xmind.ui.internal.actions.CutAction;
 import org.xmind.ui.internal.actions.DeleteAction;
@@ -520,10 +519,6 @@ public class MindMapEditorPage extends GraphicalEditorPage
         DeleteAction deleteAction = new DeleteAction(this);
         actionRegistry.addAction(deleteAction);
         addSelectionAction(deleteAction);
-
-        CreateRelationshipAction createRelationshipAction = new CreateRelationshipAction(
-                this);
-        actionRegistry.addAction(createRelationshipAction);
 
         CopyAction copyAction = new CopyAction(this);
         actionRegistry.addAction(copyAction);

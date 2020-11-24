@@ -5,7 +5,7 @@
  * under the Eclipse Public License (EPL), which is available at
  * http://www.eclipse.org/legal/epl-v10.html and the GNU Lesser General Public
  * License (LGPL), which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors: XMind Ltd. - initial API and implementation
  */
@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PartInitException;
+import org.xmind.core.net.util.LinkUtils;
 import org.xmind.ui.animation.AnimationViewer;
 import org.xmind.ui.animation.IAnimationContentProvider;
 import org.xmind.ui.browser.BrowserSupport;
@@ -214,7 +215,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.LocationListener#changed(org.eclipse.swt.
          * browser.LocationEvent)
@@ -239,7 +239,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.LocationListener#changing(org.eclipse.swt
          * .browser.LocationEvent)
@@ -258,7 +257,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see org.eclipse.swt.browser.OpenWindowListener#open(org.eclipse.swt.
          * browser .WindowEvent)
          */
@@ -272,7 +270,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.VisibilityWindowListener#hide(org.eclipse
          * .swt.browser.WindowEvent)
@@ -283,7 +280,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.VisibilityWindowListener#show(org.eclipse
          * .swt.browser.WindowEvent)
@@ -304,7 +300,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.CloseWindowListener#close(org.eclipse.swt
          * .browser.WindowEvent)
@@ -319,7 +314,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.ProgressListener#changed(org.eclipse.swt.
          * browser.ProgressEvent)
@@ -363,7 +357,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.ProgressListener#completed(org.eclipse.swt
          * .browser.ProgressEvent)
@@ -383,7 +376,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.TitleListener#changed(org.eclipse.swt.browser
          * .TitleEvent)
@@ -398,7 +390,6 @@ public class BrowserViewer implements IBrowserViewer {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.swt.browser.StatusTextListener#changed(org.eclipse.swt
          * .browser.StatusTextEvent)
@@ -425,7 +416,8 @@ public class BrowserViewer implements IBrowserViewer {
 
     private static final int MAX_HISTORY = 50;
 
-    private static final String URL_HOME = "http://www.xmind.net"; //$NON-NLS-1$
+    private static final String URL_HOME = LinkUtils.getHostByLanguage(true,
+            true);
 
     private static List<String> URL_HISTORY;
 

@@ -21,7 +21,6 @@ import org.xmind.ui.actions.DelegatingAction;
 import org.xmind.ui.actions.MindMapActionFactory;
 import org.xmind.ui.commands.DeleteNotesCommand;
 import org.xmind.ui.internal.MindMapMessages;
-import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.internal.e4models.IModelConstants;
 import org.xmind.ui.internal.utils.E4Utils;
 import org.xmind.ui.mindmap.AbstractInfoItemContributor;
@@ -58,8 +57,8 @@ public class NotesInfoItemContributor extends AbstractInfoItemContributor {
             if (!topicPart.getStatus().isActive())
                 return;
 
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("UseNotesCount"); //$NON-NLS-1$
+//            MindMapUIPlugin.getDefault().getUsageDataCollector()
+//                    .increase("UseNotesCount"); //$NON-NLS-1$
 
             final IWorkbenchWindow window = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow();
@@ -117,6 +116,10 @@ public class NotesInfoItemContributor extends AbstractInfoItemContributor {
                     .replaceAll("\r\n|\r|\n", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
         return null;
+    }
+
+    public String getSVGFilePath(ITopic topic, IAction action) {
+        return "platform:/plugin/org.xmind.ui.mindmap/icons/notes.svg"; //$NON-NLS-1$
     }
 
     @Override

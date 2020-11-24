@@ -44,6 +44,7 @@ import org.xmind.core.ITopicExtension;
 import org.xmind.core.ITopicExtensionElement;
 import org.xmind.core.IWorkbook;
 import org.xmind.core.internal.Image;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.internal.dom.StyleSheetImpl;
 import org.xmind.core.io.DirectoryStorage;
 import org.xmind.core.io.IInputSource;
@@ -288,8 +289,9 @@ public class NovaMindImporter extends MindMapImporter
     }
 
     public void build() throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ImportFromNovaCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_IMPORT,
+                UserDataConstants.IMPORT_FROM_NOVA);
         getMonitor().beginTask(null, 100);
         try {
             getMonitor()
@@ -408,6 +410,7 @@ public class NovaMindImporter extends MindMapImporter
         checkInterrupted();
 
         targetSheet = getTargetWorkbook().createSheet();
+        targetSheet.setTitleText(getSuggestedSheetTitle());
 
         Element topicEle = child(sheetEle, "topic-node"); //$NON-NLS-1$
         if (topicEle != null)

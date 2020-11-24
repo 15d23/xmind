@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -67,6 +67,7 @@ import org.xmind.core.ITopic;
 import org.xmind.core.ITopicExtension;
 import org.xmind.core.ITopicExtensionElement;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.marker.IMarker;
 import org.xmind.core.marker.IMarkerGroup;
 import org.xmind.core.marker.IMarkerRef;
@@ -134,11 +135,7 @@ import org.xmind.ui.viewers.SWTUtils;
 
 public class MindMapSelectTool extends SelectTool {
 
-    private static final int DRAG_DETECT_DELTA = 3;
-
     private IBranchPart movingSourceBranch = null;
-
-    private boolean isDragDetect = false;
 
     public MindMapSelectTool() {
         setContextId(MindMapUI.CONTEXT_MINDMAP_EDIT);
@@ -149,7 +146,6 @@ public class MindMapSelectTool extends SelectTool {
     }
 
     public boolean handleMouseDown(MouseEvent me) {
-        isDragDetect = false;
         if (me.target instanceof IPlusMinusPart) {
             if (me.target.getParent() instanceof IBranchPart) {
                 IBranchPart branch = (IBranchPart) me.target.getParent();
@@ -469,19 +465,24 @@ public class MindMapSelectTool extends SelectTool {
             return null;
 
         String hiberLoc = Core.getWorkspace()
-                .getAbsolutePath(".temp-attachments"); //$NON-NLS-1$
+                .getAbsolutePath(".temp-attachments/quickOpen"); //$NON-NLS-1$
         if (hiberLoc == null)
             return null;
 
         File hiberDir = new File(hiberLoc);
-        if (!hiberDir.isDirectory())
-            return null;
+        //clear old cache.
+        if (hiberDir.exists()) {
+            hiberDir.delete();
+        }
+
+        File attFile = new File(hiberLoc, path);
+        FileUtils.ensureFileParent(attFile);
 
         IManifest manifest = workbook.getManifest();
         IFileEntry fileEntry = manifest.getFileEntry(path);
         try {
             InputStream is = fileEntry.openInputStream();
-            OutputStream os = new FileOutputStream(hiberLoc);
+            OutputStream os = new FileOutputStream(attFile.getAbsolutePath());
             FileUtils.transfer(is, os);
         } catch (IOException e) {
             Logger.log(e,
@@ -489,7 +490,6 @@ public class MindMapSelectTool extends SelectTool {
             return null;
         }
 
-        File attFile = new File(hiberDir, path);
         if (!attFile.exists())
             return null;
 
@@ -497,25 +497,8 @@ public class MindMapSelectTool extends SelectTool {
     }
 
     protected boolean handleMouseDrag(MouseDragEvent me) {
-        if (!isDragDetect) {
-            isDragDetect = shouldDragDetect(me);
-        }
-        if (!isDragDetect) {
-            return false;
-        }
-
         movingSourceBranch = null;
         return super.handleMouseDrag(me);
-    }
-
-    private boolean shouldDragDetect(MouseDragEvent me) {
-        if (me == null) {
-            return false;
-        }
-
-        int delta = Math.abs(me.cursorLocation.x - me.startingLocation.x)
-                + Math.abs(me.cursorLocation.y - me.startingLocation.y);
-        return delta >= DRAG_DETECT_DELTA;
     }
 
     protected boolean canMove(IPart host, MouseDragEvent me) {
@@ -916,13 +899,15 @@ public class MindMapSelectTool extends SelectTool {
         List<String> paths = new ArrayList<String>(fileNames.length);
         for (String fileName : fileNames) {
             if (fileName.contains(".")) { //$NON-NLS-1$
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase(String.format("AttachmentFormatCount:%s", //$NON-NLS-1$
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_ATTACHMENT,
+                        String.format(UserDataConstants.ATTACHMENT_FORMAT_S,
                                 fileName.toLowerCase().substring(
                                         fileName.lastIndexOf('.') + 1)));
             } else {
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase("AttachmentFormatCount:BlankFormat"); //$NON-NLS-1$
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_ATTACHMENT,
+                        UserDataConstants.ATTACHMENT_FORMAT_BLANK);
             }
             String path = new File(parentPath, fileName).getAbsolutePath();
             paths.add(path);

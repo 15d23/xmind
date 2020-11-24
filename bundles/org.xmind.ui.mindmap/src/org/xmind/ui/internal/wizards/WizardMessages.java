@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -207,6 +207,7 @@ public class WizardMessages extends NLS {
     public static String NewWorkbookEditor_OpenLocalFileLink_text;
     public static String NewWorkbookEditor_OpenHomeMapLink_text;
     public static String NewWorkbookEditor_OpenPreferencesLink_text;
+    public static String ExportWizard_SuggestedFileName;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, WizardMessages.class);

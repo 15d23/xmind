@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -255,10 +255,13 @@ public class PasswordProtectedNormalizer implements IEntryStreamNormalizer {
     private int getKeySize(IEncryptionData encData) throws CoreException {
         String keySizeString = encData.getAttribute(TAG_KEY_DERIVATION,
                 ATTR_KEY_SIZE);
-        if (keySizeString == null) {
-            return Integer.parseInt(KEY_DERIVATION_SIZE);
+        if (keySizeString != null) {
+            try {
+                return Integer.parseInt(keySizeString);
+            } catch (NumberFormatException ignore) {
+            }
         }
-        return Integer.parseInt(keySizeString);
+        return Integer.parseInt(KEY_DERIVATION_SIZE);
     }
 
     /*

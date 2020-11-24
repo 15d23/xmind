@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -81,8 +81,8 @@ public abstract class GraphicalEditorActionBarContributor extends
         updateGlobalActions(getActionBars(), targetEditor, activePage);
     }
 
-    private void updateGlobalActions(IActionBars actionBars,
-            IEditorPart editor, IGraphicalEditorPage page) {
+    private void updateGlobalActions(IActionBars actionBars, IEditorPart editor,
+            IGraphicalEditorPage page) {
         IActionRegistry editorActions = getActionRegistry(editor);
         IActionRegistry pageActions = getActionRegistry(page);
 
@@ -167,12 +167,12 @@ public abstract class GraphicalEditorActionBarContributor extends
             actionRegistry.dispose();
             actionRegistry = null;
         }
+        activeEditor = null;
         super.dispose();
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.xmind.gef.ui.editor.IActionBarsUpdater#updateActionBars(org.eclipse
      * .ui.IActionBars)

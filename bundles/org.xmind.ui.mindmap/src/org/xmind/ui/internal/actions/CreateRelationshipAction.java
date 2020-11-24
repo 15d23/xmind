@@ -6,19 +6,21 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
  *******************************************************************************/
 package org.xmind.ui.internal.actions;
 
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.ui.actions.RequestAction;
 import org.xmind.gef.ui.editor.IGraphicalEditorPage;
 import org.xmind.ui.actions.MindMapActionFactory;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.mindmap.MindMapUI;
 
+@Deprecated
 public class CreateRelationshipAction extends RequestAction {
 
     public CreateRelationshipAction(IGraphicalEditorPage page) {
@@ -28,8 +30,9 @@ public class CreateRelationshipAction extends RequestAction {
 
     @Override
     public void run() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("InsertRelationshipCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_INSERT,
+                UserDataConstants.INSERT_RELATIONSHIP);
         super.run();
     }
 

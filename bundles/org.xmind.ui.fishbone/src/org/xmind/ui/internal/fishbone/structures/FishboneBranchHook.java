@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -17,7 +17,7 @@ import org.eclipse.draw2d.FigureListener;
 import org.eclipse.draw2d.IFigure;
 import org.xmind.gef.draw2d.IDecoratedFigure;
 import org.xmind.gef.draw2d.decoration.IDecoration;
-import org.xmind.gef.part.IPartListener;
+import org.xmind.gef.part.IPartListener2;
 import org.xmind.gef.part.PartEvent;
 import org.xmind.ui.branch.IBranchHook;
 import org.xmind.ui.mindmap.IBoundaryPart;
@@ -27,8 +27,8 @@ import org.xmind.ui.mindmap.IRangeListener;
 import org.xmind.ui.mindmap.ISummaryPart;
 import org.xmind.ui.mindmap.RangeEvent;
 
-public class FishboneBranchHook implements IBranchHook, FigureListener,
-        IPartListener, IRangeListener {
+public class FishboneBranchHook
+        implements IBranchHook, FigureListener, IPartListener2, IRangeListener {
 
     private IBranchPart branch;
 
@@ -161,6 +161,9 @@ public class FishboneBranchHook implements IBranchHook, FigureListener,
         subBranch.getBranchPolicy().flushStructureCache(subBranch, false, true);
     }
 
+    public void childAdding(PartEvent event) {
+    }
+
     public void childAdded(PartEvent event) {
         if (event.child instanceof IBranchPart) {
             updateSubBranches(branch);
@@ -172,6 +175,9 @@ public class FishboneBranchHook implements IBranchHook, FigureListener,
     }
 
     public void childRemoving(PartEvent event) {
+    }
+
+    public void childRemoved(PartEvent event) {
         if (event.child instanceof IBranchPart) {
             updateSubBranches(branch);
         } else if (event.child instanceof ISummaryPart

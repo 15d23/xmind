@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -30,6 +28,7 @@ import org.xmind.cathy.internal.CathyPlugin;
 import org.xmind.ui.internal.dashboard.pages.IDashboardPage;
 import org.xmind.ui.tabfolder.MTabFolder;
 import org.xmind.ui.tabfolder.MTabItem;
+import org.xmind.ui.util.XMLUtils;
 
 public class DashboardContent {
 
@@ -44,12 +43,14 @@ public class DashboardContent {
     private static final String TAG_ITEM = "item"; //$NON-NLS-1$
     private static final String ATTR_ID = "id"; //$NON-NLS-1$
     private static final String ATTR_LABEL = "label"; //$NON-NLS-1$
+    private static final String ATTR_TOOLTIP = "tooltip"; //$NON-NLS-1$
     private static final String ATTR_ICON_URI = "iconURI"; //$NON-NLS-1$
     private static final String ATTR_CONTRIBUTION_URI = "contributionURI"; //$NON-NLS-1$
     private static final String ATTR_COMMAND_ID = "commandId"; //$NON-NLS-1$
     private static final String ATTR_NAME = "name"; //$NON-NLS-1$
     private static final String ATTR_VALUE = "value"; //$NON-NLS-1$
     private static final String ATTR_WIDTH = "width"; //$NON-NLS-1$
+    private static final String ATTR_COLOR = "color"; //$NON-NLS-1$
 
     private static final String VAL_FILL = "fill"; //$NON-NLS-1$
 
@@ -119,8 +120,8 @@ public class DashboardContent {
     private void loadFromURL(URL docURL) throws Exception {
         InputStream docStream = docURL.openStream();
         try {
-            Document doc = DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder().parse(docStream);
+            Document doc = XMLUtils.getDefaultDocumentBuilder()
+                    .parse(docStream);
 
             Element rootElement = doc.getDocumentElement();
             if (rootElement == null
@@ -214,6 +215,8 @@ public class DashboardContent {
         MTabItem item = new MTabItem(tabFolder, SWT.RADIO);
 
         item.setText(page.getTitle());
+        String tooltip = readTooltip(element);
+        item.setTooltipText(tooltip);
         item.setImage(page.getImage());
 
 //        page.createControl(this.tabFolder.getBody());
@@ -246,11 +249,22 @@ public class DashboardContent {
                     "No command id found for command"); //$NON-NLS-1$
 
         String label = readLabel(element);
+        String tooltip = readTooltip(element);
         ImageDescriptor icon = readIcon(element);
 
         MTabItem item = new MTabItem(tabFolder, SWT.PUSH);
 
+        String width = element.getAttribute(ATTR_WIDTH);
+        if (width != null && !"".equals(width)) { //$NON-NLS-1$
+            try {
+                int widthValue = Integer.parseInt(width, 10);
+                item.setWidth(widthValue);
+            } catch (NumberFormatException e) {
+            }
+        }
+
         item.setText(label);
+        item.setTooltipText(tooltip);
 
         final Image iconImage = icon == null ? null : icon.createImage();
         item.addDisposeListener(new DisposeListener() {
@@ -287,10 +301,12 @@ public class DashboardContent {
             throw new IllegalArgumentException("No id for page."); //$NON-NLS-1$
 
         String label = readLabel(element);
+        String tooltip = readTooltip(element);
         ImageDescriptor icon = readIcon(element);
 
         MTabItem item = new MTabItem(tabFolder, SWT.SIMPLE);
         item.setText(label);
+        item.setTooltipText(tooltip);
         final Image iconImage = icon.createImage();
         item.addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
@@ -324,6 +340,10 @@ public class DashboardContent {
             } catch (NumberFormatException e) {
             }
         }
+
+        String color = element.getAttribute(ATTR_COLOR);
+        if (color != null && !"".equals(color)) //$NON-NLS-1$
+            item.setColor(color);
 
         return item;
     }
@@ -359,6 +379,18 @@ public class DashboardContent {
             }
         }
         return label;
+    }
+
+    private String readTooltip(Element element) {
+        String tooltip = element.getAttribute(ATTR_TOOLTIP);
+        if (tooltip.startsWith("%")) { //$NON-NLS-1$
+            String nativeTooltip = nlsProperties
+                    .getProperty(tooltip.substring(1));
+            if (nativeTooltip != null) {
+                tooltip = nativeTooltip;
+            }
+        }
+        return tooltip;
     }
 
     private MTabItem findPrimarySelection() {

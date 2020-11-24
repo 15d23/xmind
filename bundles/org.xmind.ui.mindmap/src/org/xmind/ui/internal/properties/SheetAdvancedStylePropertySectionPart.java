@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -18,6 +18,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.Request;
 import org.xmind.ui.commands.CommandMessages;
 import org.xmind.ui.internal.MindMapUIPlugin;
@@ -39,8 +40,9 @@ public class SheetAdvancedStylePropertySectionPart
         taperedLinesCheck.setText(PropertyMessages.TaperedLines_text);
         taperedLinesCheck.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent e) {
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase("ToggleTaperedlineCount"); //$NON-NLS-1$
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_FORMAT,
+                        UserDataConstants.TOGGLE_TAPERED_LINE);
                 changeTaperedLines();
             }
 
@@ -53,8 +55,9 @@ public class SheetAdvancedStylePropertySectionPart
                 .setText(PrefMessages.EditorPage_UndoRedo_gradientColor);
         gradientColorCheck.addSelectionListener(new SelectionListener() {
             public void widgetSelected(SelectionEvent e) {
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase("ToggleGradientColorCount"); //$NON-NLS-1$
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_FORMAT,
+                        UserDataConstants.TOGGLE_GRADIENT_COLOR);
                 changeGradientColor();
             }
 

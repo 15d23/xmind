@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL),
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  *
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -45,6 +45,7 @@ import org.xmind.core.ITopic;
 import org.xmind.core.ITopicExtension;
 import org.xmind.core.ITopicExtensionElement;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.marker.IMarker;
 import org.xmind.core.marker.IMarkerGroup;
 import org.xmind.core.marker.IMarkerSheet;
@@ -84,6 +85,7 @@ import org.xmind.ui.commands.ModifySummaryTopicCommand;
 import org.xmind.ui.commands.ModifyTitleTextCommand;
 import org.xmind.ui.commands.ModifyTopicHyperlinkCommand;
 import org.xmind.ui.internal.MindMapMessages;
+import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.internal.branch.UnbalancedData;
 import org.xmind.ui.mindmap.IBranchPart;
 import org.xmind.ui.mindmap.ITopicPart;
@@ -389,6 +391,9 @@ public class TopicCreatablePolicy extends MindMapPolicyBase {
 
     private void addMarker(Request request) {
         List<IPart> targets = request.getTargets();
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_MARKER,
+                UserDataConstants.USE_MARKERS);
         Command cmd = createAddMarkerCommand(request, targets);
         if (cmd != null) {
             cmd.setLabel(CommandMessages.Command_AddMarker);
@@ -762,25 +767,25 @@ public class TopicCreatablePolicy extends MindMapPolicyBase {
                                         sourceChild, request);
                     }
 
-                    String centralTopicStructure = centralTopic
-                            .getStructureClass();
-                    boolean isUnbalancedStructure = centralTopicStructure == null
-                            || UnbalancedData.STRUCTUREID_UNBALANCED
-                                    .equalsIgnoreCase(centralTopicStructure);
-                    if (isUnbalancedStructure) {
-                        ITopicExtension extension = centralTopic
-                                .createExtension(
-                                        UnbalancedData.EXTENTION_UNBALANCEDSTRUCTURE);
-                        ITopicExtensionElement element = extension.getContent()
-                                .getCreatedChild(
-                                        UnbalancedData.EXTENTIONELEMENT_RIGHTNUMBER);
-                        String preCreateRightNum = element.getTextContent();
-                        if (preCreateRightNum == null)
-                            preCreateRightNum = String.valueOf(0);
-                        int postCreateRightNum = Integer
-                                .valueOf(preCreateRightNum).intValue();
-
-                        if (parentBranch.isCentral()) {
+                    if (parentBranch.isCentral()) {
+                        String centralTopicStructure = centralTopic
+                                .getStructureClass();
+                        boolean isUnbalancedStructure = centralTopicStructure == null
+                                || UnbalancedData.STRUCTUREID_UNBALANCED
+                                        .equalsIgnoreCase(
+                                                centralTopicStructure);
+                        if (isUnbalancedStructure) {
+                            ITopicExtension extension = centralTopic
+                                    .createExtension(
+                                            UnbalancedData.EXTENTION_UNBALANCEDSTRUCTURE);
+                            ITopicExtensionElement element = extension
+                                    .getContent().getCreatedChild(
+                                            UnbalancedData.EXTENTIONELEMENT_RIGHTNUMBER);
+                            String preCreateRightNum = element.getTextContent();
+                            if (preCreateRightNum == null)
+                                preCreateRightNum = String.valueOf(0);
+                            int postCreateRightNum = Integer
+                                    .valueOf(preCreateRightNum).intValue();
 
                             int deletedRightNum = 0;
                             if (MindMapUI.REQ_CREATE_PARENT.equals(reqType)) {
@@ -869,8 +874,7 @@ public class TopicCreatablePolicy extends MindMapPolicyBase {
             if (creation != null) {
                 boolean needSelect = true;
                 if (creation instanceof ITopic) {
-                    ITopicPart topicPart = MindMapUtils
-                            .getTopicPart((ITopic) creation);
+                    IPart topicPart = viewer.findPart(creation);
                     IBranchPart branch = MindMapUtils.findBranch(topicPart);
                     IStyleSelector styleSelector = branch.getBranchPolicy()
                             .getStyleSelector(branch);

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -14,11 +14,12 @@
 package org.xmind.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.xmind.gef.ui.editor.IGraphicalEditorPage;
 import org.xmind.ui.internal.MindMapMessages;
 import org.xmind.ui.internal.editor.MindMapPageTitleEditor;
 
-public class RenameSheetAction extends Action {
+public class RenameSheetAction extends Action implements IWorkbenchAction {
 
     private IGraphicalEditorPage page;
 
@@ -41,6 +42,11 @@ public class RenameSheetAction extends Action {
         if (titleEditor != null) {
             titleEditor.startEditing(page.getIndex());
         }
+    }
+
+    @Override
+    public void dispose() {
+        page = null;
     }
 
 }

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.mindmap.IMindMap;
 import org.xmind.ui.mindmap.IMindMapImages;
@@ -34,10 +35,10 @@ import org.xmind.ui.wizards.AbstractMindMapExportPage;
 import org.xmind.ui.wizards.AbstractMindMapExportWizard;
 
 /**
- * 
  * @author Karelun huang
  */
 public class FreeMindExportWizard extends AbstractMindMapExportWizard {
+
     private static final String PAGE_NAME = "org.xmind.ui.export.freemindeExportWizard"; //$NON-NLS-1$
 
     private static final String SELECTION_NAME = "org.xmind.ui.export.freemind"; //$NON-NLS-1$
@@ -93,9 +94,10 @@ public class FreeMindExportWizard extends AbstractMindMapExportWizard {
     @Override
     protected void doExport(IProgressMonitor monitor, Display display,
             Shell parentShell)
-                    throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ExportToFreeMindCount"); //$NON-NLS-1$
+            throws InvocationTargetException, InterruptedException {
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_EXPORT,
+                UserDataConstants.EXPORT_TO_FREE_MIND);
         IMindMap mindMap = getSourceMindMap();
         FreeMindExporter exporter = new FreeMindExporter(mindMap.getSheet(),
                 getTargetPath());

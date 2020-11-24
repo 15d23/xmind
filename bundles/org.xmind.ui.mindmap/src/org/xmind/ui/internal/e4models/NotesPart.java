@@ -5,7 +5,7 @@
  * License (EPL), which is available at
  * http://www.eclipse.org/legal/epl-v10.html and the GNU Lesser General Public
  * License (LGPL), which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details. Contributors: XMind Ltd. -
+ * See https://www.xmind.net/license.html for details. Contributors: XMind Ltd. -
  * initial API and implementation
  *******************************************************************************/
 package org.xmind.ui.internal.e4models;
@@ -43,7 +43,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -71,6 +70,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.internal.E4PartWrapper;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.services.IServiceLocator;
 import org.xmind.core.Core;
@@ -86,6 +86,7 @@ import org.xmind.core.event.ICoreEventListener;
 import org.xmind.core.event.ICoreEventRegister;
 import org.xmind.core.event.ICoreEventRegistration;
 import org.xmind.core.event.ICoreEventSource2;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.EditDomain;
 import org.xmind.gef.command.CompoundCommand;
 import org.xmind.gef.command.ICommandStack;
@@ -123,6 +124,7 @@ import org.xmind.ui.richtext.LineStyle;
 import org.xmind.ui.richtext.RichTextEditViewer;
 import org.xmind.ui.richtext.RichTextUtils;
 import org.xmind.ui.richtext.TextActionConstants;
+import org.xmind.ui.tabfolder.DelegatedSelectionProvider;
 import org.xmind.ui.texteditor.IMenuContributor;
 import org.xmind.ui.texteditor.ISpellingActivation;
 import org.xmind.ui.util.Logger;
@@ -206,8 +208,9 @@ public class NotesPart extends ViewModelPart
                     || viewer.getControl().isDisposed() || adapter == null)
                 return;
 
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("NotesInsertImageCount"); //$NON-NLS-1$
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_NOTES,
+                    UserDataConstants.NOTES_INSERT_IMAGE);
 
             String path = getPath();
             if (path == null)
@@ -251,8 +254,9 @@ public class NotesPart extends ViewModelPart
         }
 
         public void run() {
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("NotesInsertHyperlinkCount"); //$NON-NLS-1$
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_NOTES,
+                    UserDataConstants.NOTES_INSERT_HYPERLINK);
 
             IRichTextRenderer renderer = viewer.getRenderer();
             ITextSelection selection = (ITextSelection) viewer.getSelection();
@@ -411,10 +415,9 @@ public class NotesPart extends ViewModelPart
         @Override
         protected void handleFontSelectionChanged(SelectionChangedEvent event) {
             super.handleFontSelectionChanged(event);
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("NotesFontChangeCount"); //$NON-NLS-1$
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("FontChangeCount"); //$NON-NLS-1$
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_NOTES,
+                    UserDataConstants.NOTES_CHANGE_FONT);
         }
     }
 
@@ -500,8 +503,8 @@ public class NotesPart extends ViewModelPart
         topicViewerContributor = new NotesPartRichTextActionBarContributor();
         workbenchWindow.getActivePage().addPartListener(this);
         showBootstrapContent();
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("UseNotesCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_NOTES, UserDataConstants.USE_NOTES);
         return contentArea;
     }
 
@@ -646,10 +649,10 @@ public class NotesPart extends ViewModelPart
         }
 
         if (contributingEditor != null) {
-            ISelectionProvider selectionProvider = contributingEditor.getSite()
-                    .getSelectionProvider();
+            DelegatedSelectionProvider selectionProvider = (DelegatedSelectionProvider) contributingEditor
+                    .getSite().getSelectionProvider();
             if (selectionProvider != null)
-                selectionProvider.removeSelectionChangedListener(
+                selectionProvider.removeAsyncSelectionChangedListener(
                         getSelectionChangedListener());
         }
 
@@ -658,10 +661,10 @@ public class NotesPart extends ViewModelPart
         ISelection newSelection = null;
 
         if (contributingEditor != null) {
-            ISelectionProvider selectionProvider = contributingEditor.getSite()
-                    .getSelectionProvider();
+            DelegatedSelectionProvider selectionProvider = (DelegatedSelectionProvider) contributingEditor
+                    .getSite().getSelectionProvider();
             if (selectionProvider != null) {
-                selectionProvider.addSelectionChangedListener(
+                selectionProvider.addAsyncSelectionChangedListener(
                         getSelectionChangedListener());
                 newSelection = selectionProvider.getSelection();
             }
@@ -812,7 +815,8 @@ public class NotesPart extends ViewModelPart
         notes.setContent(INotes.PLAIN, adapter.makeNewPlainContent());
     }
 
-    public void setFocus() {
+    protected void setFocus() {
+        super.setFocus();
         if (viewer instanceof TopicNotesViewer) {
             ((TopicNotesViewer) viewer).getImplementation().getFocusControl()
                     .setFocus();
@@ -1067,7 +1071,10 @@ public class NotesPart extends ViewModelPart
     public void partActivated(IWorkbenchPart part) {
         if (DEBUG)
             System.out.println("Part activated: " + part); //$NON-NLS-1$
-        if (part == this || !(part instanceof IEditorPart))
+        MPart modelPart = (MPart) getAdapter(MPart.class);
+        Object e4Wrapper = modelPart.getTransientData()
+                .get(E4PartWrapper.E4_WRAPPER_KEY);
+        if (part == e4Wrapper || !(part instanceof IEditorPart))
             return;
 
         if (part instanceof IGraphicalEditor) {
@@ -1089,7 +1096,10 @@ public class NotesPart extends ViewModelPart
     public void partDeactivated(IWorkbenchPart part) {
         if (DEBUG)
             System.out.println("Part deactivated: " + part); //$NON-NLS-1$
-        if (part == this) {
+        MPart modelPart = (MPart) getAdapter(MPart.class);
+        Object e4Wrapper = modelPart.getTransientData()
+                .get(E4PartWrapper.E4_WRAPPER_KEY);
+        if (part == e4Wrapper) {
             saveNotes();
         }
     }

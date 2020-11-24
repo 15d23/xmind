@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.xmind.cathy.internal.ICathyConstants;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.gallery.GalleryViewer;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.internal.dashboard.pages.DashboardPage;
@@ -55,7 +56,7 @@ public class NewFromTemplatesDashboardPage extends DashboardPage
         container.setLayout(layout);
 
         MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ShowTemplatesCount"); //$NON-NLS-1$
+                .trackView(UserDataConstants.VIEW_TEMPLATES);
         viewer = new CategorizedTemplateViewer(container);
         Control control = viewer.getControl();
         control.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -65,11 +66,11 @@ public class NewFromTemplatesDashboardPage extends DashboardPage
                 if (!templateOpening) {
                     handleTemplateSelected(event.getSelection());
                     MindMapUIPlugin.getDefault().getUsageDataCollector()
-                            .increase("CreateWorkbookCount"); //$NON-NLS-1$
+                            .trackEvent(UserDataConstants.CATEGORY_WORKBOOK,
+                                    UserDataConstants.CREATE_WORKBOOK);
                     MindMapUIPlugin.getDefault().getUsageDataCollector()
-                            .increase("CreateSheetCount"); //$NON-NLS-1$
-                    MindMapUIPlugin.getDefault().getUsageDataCollector()
-                            .increase("UseTemplatesCount"); //$NON-NLS-1$
+                            .trackEvent(UserDataConstants.CATEGORY_TEMPLATE,
+                                    UserDataConstants.USE_TEMPLATES);
                 }
             }
         });
@@ -151,6 +152,12 @@ public class NewFromTemplatesDashboardPage extends DashboardPage
             return;
 
         ITemplate template = (ITemplate) selectedElement;
+        if (template != null && null != template.getName())
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_TEMPLATE,
+                    String.format(UserDataConstants.USE_TEMPLATE_S,
+                            template.getName().replaceAll(" ", "_"))); //$NON-NLS-1$ //$NON-NLS-2$
+
         IEditorInput editorInput = MindMapUI.getEditorInputFactory()
                 .createEditorInput(template.createWorkbookRef());
         getContext().openEditor(editorInput, MindMapUI.MINDMAP_EDITOR_ID);

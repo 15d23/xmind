@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayoutManager;
+import org.eclipse.draw2d.Viewport;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
@@ -159,6 +160,9 @@ public abstract class GraphicalEditPart extends EditPart
      * .Point, org.xmind.gef.IViewer.IPartSearchCondition)
      */
     public IPart findAt(Point position, IPartSearchCondition condition) {
+        if (!(getFigure() instanceof Viewport) && !containsPoint(position)) {
+            return null;
+        }
         IPart ret;
         ret = findChildAt(position);
         if (ret != null)

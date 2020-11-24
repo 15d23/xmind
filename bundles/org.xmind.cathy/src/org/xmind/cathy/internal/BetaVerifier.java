@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -24,6 +24,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
+import org.xmind.core.net.util.LinkUtils;
 
 public class BetaVerifier {
 
@@ -107,8 +108,9 @@ public class BetaVerifier {
     }
 
     private void openDownloadSite() {
-        Program.launch("http://www.xmind.net/xmind/beta-expired/" //$NON-NLS-1$
-                + buildId.replace("qualifier", "000000000000")); //$NON-NLS-1$ //$NON-NLS-2$
+        Program.launch(
+                LinkUtils.getLinkByLanguage(true, true, "/xmind/beta-expired/") //$NON-NLS-1$
+                        + buildId.replace("qualifier", "000000000000")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public static boolean isBeta() {

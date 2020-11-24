@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.xmind.core.ISheet;
 import org.xmind.core.ITopic;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.mindmap.IMindMap;
 import org.xmind.ui.mindmap.IMindMapImages;
@@ -263,9 +264,6 @@ public class TextExportWizard extends AbstractMindMapExportWizard {
     protected void doExport(IProgressMonitor monitor, Display display,
             Shell parentShell)
             throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ExportToTextCount"); //$NON-NLS-1$
-
         monitor.beginTask(null, 100);
 
         monitor.subTask(WizardMessages.Export_Initializing);
@@ -370,8 +368,9 @@ public class TextExportWizard extends AbstractMindMapExportWizard {
 
     @Override
     protected boolean doExport() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ExportToTxtCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_EXPORT,
+                UserDataConstants.EXPORT_TO_TEXT);
         return super.doExport();
     }
 

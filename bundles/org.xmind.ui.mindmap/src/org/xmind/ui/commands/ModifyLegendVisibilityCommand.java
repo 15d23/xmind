@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -16,6 +16,7 @@ package org.xmind.ui.commands;
 import java.util.Collection;
 
 import org.xmind.core.ILegend;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.ISourceProvider;
 import org.xmind.gef.command.ModifyCommand;
 import org.xmind.ui.internal.MindMapUIPlugin;
@@ -55,8 +56,9 @@ public class ModifyLegendVisibilityCommand extends ModifyCommand {
 
     @Override
     public void execute() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ShowLegendCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_FORMAT,
+                UserDataConstants.SHOW_LEGEND);
         super.execute();
     }
 

@@ -65,6 +65,7 @@ import org.xmind.ui.internal.comments.ICommentTextViewerContainer;
 import org.xmind.ui.internal.comments.ICommentsActionBarContributor;
 import org.xmind.ui.internal.comments.SheetCommentsViewer;
 import org.xmind.ui.resources.ColorUtils;
+import org.xmind.ui.tabfolder.DelegatedSelectionProvider;
 
 @SuppressWarnings("restriction")
 public class CommentsPart extends ViewModelPart implements
@@ -391,6 +392,10 @@ public class CommentsPart extends ViewModelPart implements
         clearContent();
         selectionProvider.setSelection(null);
 
+        if (contentViewer != null) {
+            contentViewer.dispose();
+            contentViewer = null;
+        }
         if (sheet != null) {
             contentViewer = new SheetCommentsViewer(sheet, contributor,
                     selectionProvider, this, contributingEditor);
@@ -512,7 +517,8 @@ public class CommentsPart extends ViewModelPart implements
         }
     }
 
-    public void setFocus() {
+    protected void setFocus() {
+        super.setFocus();
         if (control != null && !control.isDisposed()) {
             control.setFocus();
         }
@@ -524,19 +530,19 @@ public class CommentsPart extends ViewModelPart implements
         }
 
         if (contributingEditor != null) {
-            ISelectionProvider selectionProvider = contributingEditor.getSite()
-                    .getSelectionProvider();
+            DelegatedSelectionProvider selectionProvider = (DelegatedSelectionProvider) contributingEditor
+                    .getSite().getSelectionProvider();
             if (selectionProvider != null)
-                selectionProvider.removeSelectionChangedListener(this);
+                selectionProvider.removeAsyncSelectionChangedListener(this);
         }
 
         contributingEditor = editor;
 
         if (contributingEditor != null) {
-            ISelectionProvider selectionProvider = contributingEditor.getSite()
-                    .getSelectionProvider();
+            DelegatedSelectionProvider selectionProvider = (DelegatedSelectionProvider) contributingEditor
+                    .getSite().getSelectionProvider();
             if (selectionProvider != null) {
-                selectionProvider.addSelectionChangedListener(this);
+                selectionProvider.addAsyncSelectionChangedListener(this);
             }
         }
 
@@ -751,6 +757,10 @@ public class CommentsPart extends ViewModelPart implements
                 .removePartListener(this);
         setContributingEditor(null);
         unregisterGlobalTextActionHandlers();
+        if (contentViewer != null) {
+            contentViewer.dispose();
+            contentViewer = null;
+        }
 
         super.dispose();
 

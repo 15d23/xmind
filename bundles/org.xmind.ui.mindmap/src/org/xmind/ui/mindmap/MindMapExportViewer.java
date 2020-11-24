@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -22,12 +22,10 @@ import org.xmind.ui.viewers.ICompositeProvider;
 
 /**
  * @author Frank Shaka
- * 
  */
 public class MindMapExportViewer extends MindMapViewer {
 
     /**
-     * 
      * @param parent
      * @param input
      * @param properties
@@ -39,7 +37,6 @@ public class MindMapExportViewer extends MindMapViewer {
     }
 
     /**
-     * 
      * @param parent
      * @param input
      * @param properties
@@ -82,6 +79,9 @@ public class MindMapExportViewer extends MindMapViewer {
         if (properties == null || !properties.hasKey(VIEWER_MARGIN)) {
             getProperties().set(VIEWER_MARGIN,
                     Integer.valueOf(MindMapUI.DEFAULT_EXPORT_MARGIN));
+        }
+        if (properties == null || !properties.hasKey(VIEWER_EXPORT)) {
+            getProperties().set(VIEWER_EXPORT, true);
         }
     }
 

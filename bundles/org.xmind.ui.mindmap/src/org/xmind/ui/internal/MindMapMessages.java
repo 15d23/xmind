@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -263,6 +263,8 @@ public class MindMapMessages extends NLS {
     public static String LoadWorkbookJob_text;
     public static String LoadWorkbookJob_errorDialog_GoToBackup_message;
 
+    public static String OpenLocalFileHandler_MessageDialog_title;
+
     public static String LoadWorkbookJob_errorDialog_title;
 
     public static String LoadWorkbookJob_errorDialog_Pre_message;
@@ -282,6 +284,12 @@ public class MindMapMessages extends NLS {
     public static String LocalFileWorkbookRef_removeDialog_saveAs_button;
 
     public static String LocalFileWorkbookRef_removeDialog_title;
+
+    public static String LocalFileWorkbookRef_saveFailed_description;
+
+    public static String LocalFileWorkbookRef_saveFailed_description2;
+
+    public static String LocalFileWorkbookRef_saveFailed_title;
 
     public static String MindMapEditor_CompatibilityWarning_dialogTitle;
 
@@ -675,8 +683,6 @@ public class MindMapMessages extends NLS {
     public static String WorkbookRevisionDialog_title;
     public static String WorkbookRevisionDialog_Disable_hyperlink;
 
-    public static String OpenLocalFileHandler_MessageDialog_title;
-
     public static String LocalImageModelPage_title;
     public static String LocalImageModelPage_ImageSection_description;
     public static String LocalImageModelPage_Insert_button;
@@ -767,6 +773,16 @@ public class MindMapMessages extends NLS {
     public static String ThemeGroupCore_DefaultGroup_name;
 
     public static String ExportPage_Categore_Recent_name;
+
+    public static String MarkerResourceManagerPage_AddGroup;
+
+    public static String MarkerResourceManagerPage_UserGroup;
+
+    public static String FileNotExistDialog_Title;
+    public static String FileNotExistDialog_Message;
+
+    public static String CloudFileNotExistDialog_Title;
+    public static String CloudFileNotExistDialog_Message;
 
     static {
         // initialize resource bundle

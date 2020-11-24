@@ -6,14 +6,12 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
  *******************************************************************************/
 package org.xmind.ui.internal.mindmap;
-
-import static org.xmind.core.ISheetSettings.INFO_ITEM;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,14 +22,10 @@ import java.util.Set;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayoutManager;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.jface.action.IAction;
 import org.xmind.core.Core;
 import org.xmind.core.IImage;
 import org.xmind.core.INumbering;
 import org.xmind.core.IRelationship;
-import org.xmind.core.ISettingEntry;
-import org.xmind.core.ISheet;
-import org.xmind.core.ISheetSettings;
 import org.xmind.core.ITopic;
 import org.xmind.core.event.CoreEvent;
 import org.xmind.core.event.ICoreEventRegister;
@@ -54,6 +48,7 @@ import org.xmind.gef.ui.actions.ActionRegistry;
 import org.xmind.gef.ui.actions.IActionRegistry;
 import org.xmind.ui.internal.IconTipContributorManager;
 import org.xmind.ui.internal.InfoItemContributorManager;
+import org.xmind.ui.internal.TopicInfoItemManager;
 import org.xmind.ui.internal.decorators.TopicDecorator;
 import org.xmind.ui.internal.figures.TopicFigure;
 import org.xmind.ui.internal.graphicalpolicies.TopicGraphicalPolicy;
@@ -96,8 +91,9 @@ public class TopicPart extends NodePart implements ITopicPart {
                 pSheet = pMarker.getOwnedSheet();
                 grouplist = pSheet.getMarkerGroups();
                 pMarkerGroup = pMarker.getParent();
-                return -10000 - 2000 + grouplist.indexOf(pMarkerGroup) * 100
-                        + pMarkerGroup.getMarkers().indexOf(pMarker);
+                return pMarkerGroup == null ? 0
+                        : -10000 - 2000 + grouplist.indexOf(pMarkerGroup) * 100
+                                + pMarkerGroup.getMarkers().indexOf(pMarker);
             }
 
             IMarkerSheet qSheet;
@@ -107,8 +103,9 @@ public class TopicPart extends NodePart implements ITopicPart {
                 qSheet = qMarker.getOwnedSheet();
                 grouplist = qSheet.getMarkerGroups();
                 qMarkerGroup = qMarker.getParent();
-                return 10000 + 2000 - grouplist.indexOf(qMarkerGroup) * 100
-                        - qMarkerGroup.getMarkers().indexOf(qMarker);
+                return qMarkerGroup == null ? 0
+                        : 10000 + 2000 - grouplist.indexOf(qMarkerGroup) * 100
+                                - qMarkerGroup.getMarkers().indexOf(qMarker);
             }
             pSheet = pMarker.getOwnedSheet();
             qSheet = qMarker.getOwnedSheet();
@@ -116,6 +113,10 @@ public class TopicPart extends NodePart implements ITopicPart {
             grouplist = pSheet.getMarkerGroups();
             pMarkerGroup = pMarker.getParent();
             qMarkerGroup = qMarker.getParent();
+            if (pMarkerGroup == null || qMarkerGroup == null) {
+                return 0;
+            }
+
             if (pSheet.equals(qSheet)) {
                 if (pMarkerGroup.equals(qMarkerGroup)) {
                     List<IMarker> nosingle = pMarkerGroup.getMarkers();
@@ -163,6 +164,9 @@ public class TopicPart extends NodePart implements ITopicPart {
     private IAnchor anchor = null;
 
     private IAnchorListener anchorListener = null;
+
+    private TopicInfoItemManager topicInfoItemManager = new TopicInfoItemManager(
+            this);;
 
     public TopicPart() {
         setDecorator(TopicDecorator.getInstance());
@@ -354,62 +358,10 @@ public class TopicPart extends NodePart implements ITopicPart {
         for (IMarkerRef ref : markerRefsToSort) {
             list.add(new ViewerModel(MarkerPart.class, ref));
         }
-
     }
 
     private void addIconTips(ITopic topic, List<Object> list) {
-        List<IIconTipContributor> contributors = IconTipContributorManager
-                .getInstance().getContributors();
-        if (!contributors.isEmpty()) {
-            for (IIconTipContributor contributor : contributors) {
-                IAction action = contributor.createAction(this, topic);
-                if (action != null) {
-                    list.add(new IconTip(topic, contributor, action));
-                }
-            }
-        }
-
-        List<IInfoItemContributor> contributors2 = InfoItemContributorManager
-                .getInstance().getContributors();
-        if (!contributors2.isEmpty()) {
-            for (IInfoItemContributor contributor : contributors2) {
-                IAction action = contributor.createAction(this, topic);
-                if (action != null)
-                    list.add(new IconTip(topic, contributor, action));
-            }
-        }
-
-        List<IInfoItemContributor> bothContributors = InfoItemContributorManager
-                .getInstance().getBothContributors();
-        if (!bothContributors.isEmpty()) {
-            ISheet sheet = topic.getOwnedSheet();
-            if (sheet != null) {
-                for (IInfoItemContributor c : bothContributors) {
-                    String infoItemMode = null;
-                    String type = c.getId();
-                    if (type != null && !"".equals(type)) { //$NON-NLS-1$
-                        List<ISettingEntry> entries = sheet.getSettings()
-                                .getEntries(INFO_ITEM);
-                        for (ISettingEntry entry : entries) {
-                            String t = entry
-                                    .getAttribute(ISheetSettings.ATTR_TYPE);
-                            if (type.equals(t))
-                                infoItemMode = entry
-                                        .getAttribute(ISheetSettings.ATTR_MODE);
-                        }
-                    }
-
-                    if (infoItemMode == null || "".equals(infoItemMode)) //$NON-NLS-1$
-                        infoItemMode = c.getDefaultMode();
-                    if (ISheetSettings.MODE_ICON.equals(infoItemMode)
-                            || !c.isCardModeAvailable(topic, this)) {
-                        IAction action = c.createAction(this, topic);
-                        if (action != null)
-                            list.add(new IconTip(topic, c, action));
-                    }
-                }
-            }
-        }
+        list.addAll(topicInfoItemManager.getIconTips());
     }
 
     public IPart findAt(Point position) {
@@ -555,6 +507,7 @@ public class TopicPart extends NodePart implements ITopicPart {
                 .getInstance().getContributors()) {
             iconTipCont.topicDeactivated(this);
         }
+        topicInfoItemManager.topicDeactivated();
         super.onDeactivated();
     }
 

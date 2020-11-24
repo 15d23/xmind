@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -49,6 +49,8 @@ public class ContentsLayer extends BaseLayer implements IOriginBased {
     private boolean centered;
 
     private boolean constrained;
+
+    private boolean export;
 
     public boolean isCentered() {
         return centered;
@@ -153,8 +155,8 @@ public class ContentsLayer extends BaseLayer implements IOriginBased {
                     Rectangle area = getViewportClientArea(this);
                     if (area != null) {
                         area = area.getCopy().scale(1 / getScale(this, 1));
-                        Point p = new Point(area.x + (area.width) / 2, area.y
-                                + (area.height) / 2);
+                        Point p = new Point(area.x + (area.width) / 2,
+                                area.y + (area.height) / 2);
                         return p;
                     }
                 }
@@ -169,9 +171,11 @@ public class ContentsLayer extends BaseLayer implements IOriginBased {
                 } else {
                     area = area.getCopy().scale(1 / getScale(this, 1));
                 }
-                return new Point(area.x + (area.width - ins.left - ins.right)
-                        / 2 + ins.left, area.y
-                        + (area.height - ins.top - ins.bottom) / 2 + ins.top);
+                return new Point(
+                        area.x + (area.width - ins.left - ins.right) / 2
+                                + ins.left,
+                        area.y + (area.height - ins.top - ins.bottom) / 2
+                                + ins.top);
             }
             return contents.getBounds().getLocation();
         }
@@ -228,9 +232,10 @@ public class ContentsLayer extends BaseLayer implements IOriginBased {
             } else {
                 area = area.getCopy().scale(1 / getScale(this, 1));
             }
-            Rectangle contentBounds = new Rectangle(area.x
-                    + (area.width - size.width) / 2, area.y
-                    + (area.height - size.height) / 2, size.width, size.height);
+            Rectangle contentBounds = new Rectangle(
+                    area.x + (area.width - size.width) / 2,
+                    area.y + (area.height - size.height) / 2, size.width,
+                    size.height);
             if (contents instanceof FreeformFigure) {
                 ((FreeformFigure) contents).setFreeformBounds(contentBounds);
             } else {
@@ -243,11 +248,12 @@ public class ContentsLayer extends BaseLayer implements IOriginBased {
                 ins = ((IReferencedFigure) contents).getReferenceDescription();
             } else {
                 Dimension size = contents.getPreferredSize();
-                ins = new Insets(size.height - size.height / 2, size.width
-                        - size.width / 2, size.height / 2, size.width / 2);
+                ins = new Insets(size.height - size.height / 2,
+                        size.width - size.width / 2, size.height / 2,
+                        size.width / 2);
             }
-            Rectangle r = new Rectangle(o.x - ins.left, o.y - ins.top, ins
-                    .getWidth(), ins.getHeight());
+            Rectangle r = new Rectangle(o.x - ins.left, o.y - ins.top,
+                    ins.getWidth(), ins.getHeight());
             contents.setBounds(r);
         }
     }
@@ -290,6 +296,18 @@ public class ContentsLayer extends BaseLayer implements IOriginBased {
     public void invalidate() {
         super.invalidate();
         origin = null;
+    }
+
+    public void setExport(boolean export) {
+        this.export = export;
+    }
+
+    @Override
+    public Insets getInsets() {
+        if (export && contents != null) {
+            return getContentsReferenceDescription(false);
+        }
+        return super.getInsets();
     }
 
 }

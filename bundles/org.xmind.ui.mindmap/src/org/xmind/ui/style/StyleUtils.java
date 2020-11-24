@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -552,8 +552,11 @@ public class StyleUtils {
 
                 String[] indexAndValue = getAncestorMultiLineColor(branch);
                 if (indexAndValue != null && indexAndValue.length == 2) {
-                    index = Integer.parseInt(indexAndValue[0]);
-                    value = indexAndValue[1];
+                    try {
+                        index = Integer.parseInt(indexAndValue[0]);
+                        value = indexAndValue[1];
+                    } catch (NumberFormatException ignore) {
+                    }
                 }
                 ISheetPart sheet = null;
                 if (value == null || Styles.NONE.equals(value)) {

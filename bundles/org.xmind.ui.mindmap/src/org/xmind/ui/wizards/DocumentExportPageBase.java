@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -52,6 +52,7 @@ import org.xmind.core.ITopic;
 import org.xmind.core.IWorkbook;
 import org.xmind.core.marker.IMarker;
 import org.xmind.core.marker.IMarkerRef;
+import org.xmind.core.net.util.LinkUtils;
 import org.xmind.gef.GraphicalViewer;
 import org.xmind.gef.IGraphicalViewer;
 import org.xmind.gef.draw2d.AdvancedToolbarLayout;
@@ -79,7 +80,6 @@ import org.xmind.ui.util.MindMapUtils;
  * Export wizard page for exporting documents with mixed text and graphics.
  * 
  * @author MANGOSOFT
- * 
  */
 public abstract class DocumentExportPageBase extends AbstractMindMapExportPage {
 
@@ -1030,7 +1030,7 @@ public abstract class DocumentExportPageBase extends AbstractMindMapExportPage {
         mainTopic.setLabels(
                 Arrays.asList(WizardMessages.DocumentExportPage_Sample_Label1,
                         WizardMessages.DocumentExportPage_Sample_Label2));
-        mainTopic.setHyperlink("http://www.xmind.net"); //$NON-NLS-1$
+        mainTopic.setHyperlink(LinkUtils.getHostByLanguage(true, true));
         mainTopic.getImage().setSource("temp.png"); //$NON-NLS-1$
         INotesContent notesContent = workbook.createNotesContent(INotes.PLAIN);
         ((IPlainNotesContent) notesContent).setTextContent(getSampleNotes());

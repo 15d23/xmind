@@ -5,7 +5,7 @@
  * License (EPL), which is available at
  * http://www.eclipse.org/legal/epl-v10.html and the GNU Lesser General Public
  * License (LGPL), which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details. Contributors: XMind Ltd. -
+ * See https://www.xmind.net/license.html for details. Contributors: XMind Ltd. -
  * initial API and implementation
  *******************************************************************************/
 package org.xmind.ui.internal.properties;
@@ -32,6 +32,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.GEF;
 import org.xmind.gef.IViewer;
 import org.xmind.gef.Request;
@@ -71,8 +72,9 @@ public class FontPropertySectionPart extends StyledPropertySectionPart {
                     .getFirstElement();
             if (o instanceof String) {
                 changeFontName((String) o);
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase("FontChangeCount"); //$NON-NLS-1$
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_STYLE,
+                        UserDataConstants.CHANGE_FONT);
             }
         }
 
@@ -457,7 +459,11 @@ public class FontPropertySectionPart extends StyledPropertySectionPart {
             picker.setAutoColor(null);
         } else {
             IGraphicalPart part = getGraphicalPart(getSelectedElements()[0]);
+            if (part == null)
+                return;
             IStyleSelector ss = getStyleSelector(part);
+            if (ss == null)
+                return;
             String autoValue = ss.getAutoValue(part, Styles.TextColor);
             RGB autoColor = StyleUtils.convertRGB(Styles.TextColor, autoValue);
             picker.setAutoColor(autoColor);

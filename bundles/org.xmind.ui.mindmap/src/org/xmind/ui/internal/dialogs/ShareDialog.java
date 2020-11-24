@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -125,9 +125,20 @@ public class ShareDialog extends Dialog {
 
         applyDialogFont(composite);
 
-        createTopSection(composite);
-        createSeparator(composite);
-        createBottomSection(composite);
+        boolean hasTopItem = hasEnabledItem(
+                RegistryConstants.VAL_CATEGORY_POPULAR);
+        boolean hasBottomItem = hasEnabledItem(
+                RegistryConstants.VAL_CATEGORY_NORMAL);
+
+        if (hasTopItem) {
+            createTopSection(composite);
+        }
+        if (hasTopItem && hasBottomItem) {
+            createSeparator(composite);
+        }
+        if (hasBottomItem) {
+            createBottomSection(composite);
+        }
 
         return composite;
     }
@@ -148,9 +159,13 @@ public class ShareDialog extends Dialog {
         List<ShareOption> options = optionRegistry
                 .getOptionsByCategory(RegistryConstants.VAL_CATEGORY_POPULAR);
         for (ShareOption option : options) {
-            createShareItem(composite, option.getLabel(),
-                    (Image) resources.get(option.getImage()), option.getId(), 3,
-                    8);
+            boolean disabled = (isCnUser()
+                    && "cn".equals(option.getDisabledSite())); //$NON-NLS-1$
+            if (!disabled) {
+                createShareItem(composite, option.getLabel(),
+                        (Image) resources.get(option.getImage()),
+                        option.getId(), 3, 8);
+            }
         }
     }
 
@@ -192,9 +207,13 @@ public class ShareDialog extends Dialog {
         List<ShareOption> options = optionRegistry
                 .getOptionsByCategory(RegistryConstants.VAL_CATEGORY_NORMAL);
         for (ShareOption option : options) {
-            createShareItem(composite, option.getLabel(),
-                    (Image) resources.get(option.getImage()), option.getId(), 0,
-                    5);
+            boolean disabled = (isCnUser()
+                    && "cn".equals(option.getDisabledSite())); //$NON-NLS-1$
+            if (!disabled) {
+                createShareItem(composite, option.getLabel(),
+                        (Image) resources.get(option.getImage()),
+                        option.getId(), 0, 5);
+            }
         }
     }
 
@@ -264,6 +283,27 @@ public class ShareDialog extends Dialog {
             return;
 
         okPressed();
+    }
+
+    private boolean hasEnabledItem(String category) {
+        List<ShareOption> options = optionRegistry
+                .getOptionsByCategory(category);
+
+        for (ShareOption option : options) {
+            boolean disabled = (isCnUser()
+                    && "cn".equals(option.getDisabledSite())); //$NON-NLS-1$
+            if (!disabled) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isCnUser() {
+        String cnUser = System.getProperty("account.cnUser"); //$NON-NLS-1$
+        boolean isCnUser = "true".equals(cnUser); //$NON-NLS-1$
+        return isCnUser;
     }
 
 }

@@ -19,6 +19,7 @@ import org.xmind.core.IRelationship;
 import org.xmind.core.ISheet;
 import org.xmind.core.ITopic;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.internal.dom.DOMConstants;
 import org.xmind.core.internal.dom.PlainNotesContentImpl;
 import org.xmind.core.internal.dom.SheetImpl;
@@ -52,8 +53,9 @@ public class LightenImporter extends MindMapImporter implements ErrorHandler {
 
     @Override
     public void build() throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ImportFromLightenCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_IMPORT,
+                UserDataConstants.IMPORT_FROM_LIGHTEN);
         ZipInputStream zis = null;
         try {
             getMonitor().beginTask(null, 100);
@@ -102,6 +104,7 @@ public class LightenImporter extends MindMapImporter implements ErrorHandler {
         WorkbookImpl workbook = (WorkbookImpl) getTargetWorkbook();
         targetSheet = workbook.createSheet();
         SheetImpl sheet = (SheetImpl) targetSheet;
+        sheet.setTitleText(getSuggestedSheetTitle());
 
         if (targetStyleSheet == null) {
             targetStyleSheet = workbook.getStyleSheet();

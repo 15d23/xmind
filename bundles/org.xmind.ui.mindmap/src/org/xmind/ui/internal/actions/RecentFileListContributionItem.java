@@ -1,6 +1,5 @@
 package org.xmind.ui.internal.actions;
 
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -17,12 +17,12 @@ import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IServiceLocator;
 import org.xmind.ui.commands.MindMapCommandConstants;
 import org.xmind.ui.editor.IEditorHistory;
-import org.xmind.ui.internal.protocols.FilePathParser;
+import org.xmind.ui.editor.IEditorHistoryItem;
 
 public class RecentFileListContributionItem extends CompoundContributionItem
         implements IWorkbenchContribution {
 
-    private static final int MAX_SIZE = 50;
+    private static final int MAX_SIZE = 5;
 
     private IServiceLocator serviceLocator;
 
@@ -66,16 +66,15 @@ public class RecentFileListContributionItem extends CompoundContributionItem
         System.arraycopy(unpinnedInputURIs, 0, inputURIs, pinnedItensToShow,
                 Math.min(unpinnedItemsToShow, unpinnedInputURIs.length));
 
-        Map<URI, String> labels = new HashMap<URI, String>(inputURIs.length);
-        FilePathParser.calculateFileURILabels(inputURIs, labels);
-
         for (int index = 0; index < inputURIs.length; index++) {
             URI inputURI = inputURIs[index];
-            if (inputURI.getScheme().equalsIgnoreCase("file")) //$NON-NLS-1$
-                if (new File(inputURI).exists()) {
-                    items.add(makeHistoryCommandItem(inputURI, index,
-                            labels.get(inputURI)));
-                }
+            IEditorHistoryItem item = editorHistory.getItem(inputURI);
+            items.add(makeHistoryCommandItem(inputURI, index, item.getName()));
+        }
+
+        // add separator
+        if (items.size() > 0) {
+            items.add(new Separator());
         }
     }
 

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -14,6 +14,7 @@
 package org.xmind.ui.internal.actions;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.internal.MindMapMessages;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.prefs.PrefConstants;
@@ -29,8 +30,9 @@ public class AllowOverlapsAction extends BooleanPrefAction {
 
     @Override
     public void run() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("AllowOverlapCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_MODIFY,
+                UserDataConstants.ALLOW_OVERLAP);
         super.run();
     }
 

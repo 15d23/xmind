@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -15,7 +15,7 @@ package org.xmind.ui.internal.branch;
 
 import org.eclipse.draw2d.FigureListener;
 import org.eclipse.draw2d.IFigure;
-import org.xmind.gef.part.IPartListener;
+import org.xmind.gef.part.IPartListener2;
 import org.xmind.gef.part.PartEvent;
 import org.xmind.ui.branch.IBranchHook;
 import org.xmind.ui.branch.IBranchPolicy;
@@ -28,8 +28,8 @@ import org.xmind.ui.mindmap.ISummaryPart;
 import org.xmind.ui.mindmap.RangeEvent;
 import org.xmind.ui.util.MindMapUtils;
 
-public class MapBranchHook implements IBranchHook, FigureListener,
-        IPartListener, IRangeListener {
+public class MapBranchHook
+        implements IBranchHook, FigureListener, IPartListener2, IRangeListener {
 
     protected IBranchPart branch;
 
@@ -113,9 +113,8 @@ public class MapBranchHook implements IBranchHook, FigureListener,
     }
 
     private String calcStructureId(IBranchPart branch) {
-        ICacheValueProvider valueProvider = MindMapUtils
-                .getCacheManager(branch).getValueProvider(
-                        IBranchPolicy.CACHE_STRUCTURE_ID);
+        ICacheValueProvider valueProvider = MindMapUtils.getCacheManager(branch)
+                .getValueProvider(IBranchPolicy.CACHE_STRUCTURE_ID);
         if (valueProvider != null) {
             Object value = valueProvider.getValue(branch,
                     IBranchPolicy.CACHE_STRUCTURE_ID);
@@ -124,6 +123,9 @@ public class MapBranchHook implements IBranchHook, FigureListener,
             }
         }
         return null;
+    }
+
+    public void childAdding(PartEvent event) {
     }
 
     public void childAdded(PartEvent event) {
@@ -139,6 +141,9 @@ public class MapBranchHook implements IBranchHook, FigureListener,
     }
 
     public void childRemoving(PartEvent event) {
+    }
+
+    public void childRemoved(PartEvent event) {
         if (event.child instanceof IBranchPart) {
             branch.getFigure().invalidate();
             branch.treeUpdate(true);

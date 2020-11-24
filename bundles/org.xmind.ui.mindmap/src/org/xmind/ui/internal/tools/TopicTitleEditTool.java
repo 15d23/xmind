@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -145,25 +145,24 @@ public class TopicTitleEditTool extends TitleEditTool {
         locatingHandle = true;
         Display.getCurrent().asyncExec(new Runnable() {
             public void run() {
-                try {
-                    if (widthHandle == null || getTargetViewer() == null
-                            || getTargetViewer().getControl() == null
-                            || getTargetViewer().getControl().isDisposed()
-                            || control.isDisposed())
-                        return;
-
-                    if (width < 0 && control.getBounds().width > 500) {
-                        widthChanged = true;
-                        getHelper().setPrefWidth(500);
-                    }
-                    Rectangle bounds = new Rectangle(control.getBounds());
-                    Point loc = getTargetViewer()
-                            .computeToLayer(bounds.getLocation(), false);
-                    widthHandle.setBounds(new Rectangle(loc.x + bounds.width,
-                            loc.y, HANDLE_WIDTH, bounds.height));
-                } finally {
+                if (widthHandle == null || getTargetViewer() == null
+                        || getTargetViewer().getControl() == null
+                        || getTargetViewer().getControl().isDisposed()
+                        || control == null || control.isDisposed()) {
                     locatingHandle = false;
+                    return;
                 }
+
+                if (width < 0 && control.getBounds().width > 500) {
+                    widthChanged = true;
+                    getHelper().setPrefWidth(500);
+                }
+                Rectangle bounds = new Rectangle(control.getBounds());
+                Point loc = getTargetViewer()
+                        .computeToLayer(bounds.getLocation(), false);
+                widthHandle.setBounds(new Rectangle(loc.x + bounds.width, loc.y,
+                        HANDLE_WIDTH, bounds.height));
+                locatingHandle = false;
             }
         });
     }
@@ -240,7 +239,7 @@ public class TopicTitleEditTool extends TitleEditTool {
                     new Point(getEditor().getControl().getLocation()), false);
             width = Math.max(20, (int) ((p.x - leftTop.x) / getScale()));
             getHelper().setPrefWidth(width);
-            getHelper().refreshEditor();
+            getHelper().refreshEditor(false);
             return true;
         }
         return super.handleMouseDrag(me);

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL),
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  *
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -203,15 +203,22 @@ public class CathyWorkbenchAdvisor extends WorkbenchAdvisor
 
     private void saveEditorsState(IMemento memento,
             ArrayList<IEditorReference> editorRefs) {
-        IWorkbenchPage activePage = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage();
-        IEditorPart activeEditor = activePage.getActiveEditor();
+        IEditorPart activeEditor = null;
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow();
+        if (window != null && window.getActivePage() != null) {
+            activeEditor = window.getActivePage().getActiveEditor();
+        }
 
         IMemento childrenMemento = memento
                 .createChild(IWorkbenchConstants.TAG_EDITORS);
         if (!editorRefs.isEmpty())
             for (IEditorReference ref : editorRefs) {
                 IEditorPart editor = ref.getEditor(false);
+                if (editor == null) {
+                    continue;
+                }
                 IMemento editorMemento = childrenMemento
                         .createChild(IWorkbenchConstants.TAG_EDITOR);
                 editorMemento.putBoolean(IWorkbenchConstants.TAG_ACTIVE_PART,

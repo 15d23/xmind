@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -14,6 +14,7 @@
 package org.xmind.ui.wizards;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -43,6 +44,8 @@ import org.xmind.ui.util.Logger;
 import org.xmind.ui.util.MindMapUtils;
 
 public abstract class AbstractMindMapExportWizard extends AbstractExportWizard {
+
+    private static final int MAX_FILE_NAME_LENGTH = 120;
 
     private IGraphicalEditor sourceEditor;
 
@@ -132,6 +135,7 @@ public abstract class AbstractMindMapExportWizard extends AbstractExportWizard {
                     WizardMessages.Export_UncompatibleFormat_title, messages))
                 return false;
         }
+        setTargetPath(trimPath(getTargetPath()));
 
         if (!isOverwriteWithoutPrompt() && new File(getTargetPath()).exists()) {
             if (!DialogUtils.confirmOverwrite(getShell(), getTargetPath()))
@@ -161,6 +165,17 @@ public abstract class AbstractMindMapExportWizard extends AbstractExportWizard {
             }
         }
         return isLagel;
+    }
+
+    private String trimPath(String path) {
+        String dirPath = path.substring(0,
+                path.lastIndexOf(File.separator) + 1);
+        String fileName = FileUtils.getNoExtensionFileName(path);
+
+        if (fileName.length() > MAX_FILE_NAME_LENGTH) {
+            fileName = fileName.substring(0, MAX_FILE_NAME_LENGTH);
+        }
+        return dirPath + fileName + FileUtils.getExtension(path);
     }
 
     protected boolean doExport() {
@@ -210,6 +225,13 @@ public abstract class AbstractMindMapExportWizard extends AbstractExportWizard {
     protected void handleExportException(Throwable e) {
         Logger.log(e, NLS.bind(WizardMessages.Export_FailedWhenExport,
                 getFormatName()));
+        e.printStackTrace();
+
+        if (e instanceof FileNotFoundException) {
+            MessageDialog.openInformation(getShell(),
+                    WizardMessages.ExportPage_FindFileFail_title,
+                    WizardMessages.ExportPage_FindFileFail_message);
+        }
     }
 
     private Shell findParentShell(Display display) {
@@ -228,7 +250,7 @@ public abstract class AbstractMindMapExportWizard extends AbstractExportWizard {
 
     protected abstract void doExport(IProgressMonitor monitor, Display display,
             Shell parentShell)
-                    throws InvocationTargetException, InterruptedException;
+            throws InvocationTargetException, InterruptedException;
 
     protected OutputStream wrapMonitor(OutputStream realStream,
             IProgressMonitor monitor) {
@@ -281,8 +303,15 @@ public abstract class AbstractMindMapExportWizard extends AbstractExportWizard {
 
     @Override
     protected String getSuggestedFileName() {
-        String fileName = getSourceMindMap().getCentralTopic().getTitleText();
+        IMindMap mindMap = getSourceMindMap();
+        if (mindMap == null)
+            return WizardMessages.ExportWizard_SuggestedFileName;
+        String fileName = mindMap.getCentralTopic().getTitleText();
         String replacedFileName = MindMapUtils.trimFileName(fileName);
+        if (replacedFileName.length() > MAX_FILE_NAME_LENGTH) {
+            replacedFileName = replacedFileName.substring(0,
+                    MAX_FILE_NAME_LENGTH);
+        }
         return replacedFileName;
     }
 

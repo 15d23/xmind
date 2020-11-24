@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.util.FileUtils;
 import org.xmind.gef.image.ImageExportUtils;
 import org.xmind.gef.image.ImageWriter;
@@ -86,13 +87,13 @@ public class ImageExportWizard extends AbstractMindMapExportWizard {
         }, //
         Generating(WizardMessages.ImageExportPage_GeneratingPreview,
                 SWT.COLOR_DARK_GRAY, SWT.NONE), //
-                Error(WizardMessages.ImageExportPage_FailedToGeneratePreview,
-                        SWT.COLOR_DARK_RED, SWT.NONE) {
-                    public String getTitle(Image image, boolean largeImage) {
-                        return makeErrorMessage(
-                                super.getTitle(image, largeImage), largeImage);
-                    }
-                };
+        Error(WizardMessages.ImageExportPage_FailedToGeneratePreview,
+                SWT.COLOR_DARK_RED, SWT.NONE) {
+            public String getTitle(Image image, boolean largeImage) {
+                return makeErrorMessage(super.getTitle(image, largeImage),
+                        largeImage);
+            }
+        };
 
         private int colorId;
 
@@ -828,9 +829,10 @@ public class ImageExportWizard extends AbstractMindMapExportWizard {
 
     protected void doExport(IProgressMonitor monitor, final Display display,
             final Shell parentShell)
-                    throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ExportToImageCount"); //$NON-NLS-1$
+            throws InvocationTargetException, InterruptedException {
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_EXPORT,
+                UserDataConstants.EXPORT_TO_IMAGE);
         monitor.beginTask(null, 100);
 
         monitor.subTask(WizardMessages.ImageExport_CreatingSourceImage);

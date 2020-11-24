@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL),
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  *
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Authenticator;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -38,6 +39,7 @@ import org.xmind.core.Core;
 import org.xmind.core.internal.runtime.WorkspaceConfigurer;
 import org.xmind.core.internal.runtime.WorkspaceSession;
 import org.xmind.core.licensing.ILicenseAgent;
+import org.xmind.core.net.util.LinkUtils;
 import org.xmind.core.usagedata.IUsageDataSampler;
 import org.xmind.ui.internal.app.ApplicationConstants;
 import org.xmind.ui.internal.statushandlers.DefaultErrorReporter;
@@ -157,7 +159,8 @@ public class CathyPlugin extends AbstractUIPlugin {
     /**
      * Online help page.
      */
-    public static final String ONLINE_HELP_URL = "https://www.xmind.net/xmind/help"; //$NON-NLS-1$
+    public static final String ONLINE_HELP_URL = LinkUtils
+            .getLinkByLanguage(true, true, "/xmind/help"); //$NON-NLS-1$
 
     /**
      * Boolean value:<br>
@@ -173,6 +176,8 @@ public class CathyPlugin extends AbstractUIPlugin {
      */
     public static final int AUTO_SAVE_EDITOR_STATE_INTERVALS = 60000;
     public static final String OPTION_AUTO_SAVE_EDITOR_STATE_INTERVALS = "/debug/autoSaveEditorStateIntervals"; //$NON-NLS-1$
+
+    public static final String KEY_NOT_SHOW_UPLOAD_DATA_CHECK = "org.xmind.cathy.notShowUploadDataCheck"; //$NON-NLS-1$
 
     // The shared instance.
     private static CathyPlugin plugin;
@@ -286,6 +291,8 @@ public class CathyPlugin extends AbstractUIPlugin {
             try {
                 networkPlugin
                         .loadClass("org.eclipse.core.internal.net.Activator"); //$NON-NLS-1$
+                /// cancel show AuthenticationDialog when return 401
+                Authenticator.setDefault(null);
             } catch (ClassNotFoundException e) {
                 getLog().log(new Status(IStatus.WARNING, PLUGIN_ID,
                         "Failed to activate plugin 'org.eclipse.core.net'.", //$NON-NLS-1$

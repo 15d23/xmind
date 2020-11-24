@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -14,8 +14,8 @@
 package org.xmind.ui.internal.mindmap;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.xmind.core.event.CoreEvent;
 import org.xmind.core.event.CoreEventRegister;
 import org.xmind.core.event.ICoreEventListener;
@@ -109,10 +109,12 @@ public abstract class MindMapPartBase extends GraphicalEditPart
     }
 
     protected void runInUI(Runnable job, boolean async) {
-        Shell shell = getSite().getShell();
-        if (shell == null || shell.isDisposed())
+        Control control = getSite().getViewerControl();
+        if (control == null || control.isDisposed()) {
             return;
-        Display display = shell.getDisplay();
+        }
+
+        Display display = control.getDisplay();
         if (display == null || display.isDisposed())
             return;
         if (async) {
@@ -262,7 +264,7 @@ public abstract class MindMapPartBase extends GraphicalEditPart
 
     protected void updateFeedback() {
         if (selectionFeedbackHelper != null) {
-            selectionFeedbackHelper.updateFeedback(true);
+            selectionFeedbackHelper.updateFeedback(false);
         }
     }
 

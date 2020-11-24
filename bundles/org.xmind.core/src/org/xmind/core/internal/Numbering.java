@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -67,8 +67,12 @@ public abstract class Numbering extends AbstractWorkbookComponent
             return -1;
 
         String dv = getDepth();
-        if (dv != null)
-            return Integer.parseInt(dv);
+        if (dv != null) {
+            try {
+                return Integer.parseInt(dv);
+            } catch (NumberFormatException ignore) {
+            }
+        }
 
         if (isInherited(1))
             return getParent().getParent().getNumbering().getComputedDepth()

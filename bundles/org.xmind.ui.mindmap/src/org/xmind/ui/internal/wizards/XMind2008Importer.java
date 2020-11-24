@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -18,10 +18,12 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.xmind.core.Core;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.io.DirectoryStorage;
 import org.xmind.core.io.IStorage;
 import org.xmind.core.util.CloneHandler;
 import org.xmind.ui.internal.MindMapUIPlugin;
+import org.xmind.ui.mindmap.LazyPasswordBasedEncryptor;
 import org.xmind.ui.mindmap.MindMapUI;
 import org.xmind.ui.wizards.MindMapImporter;
 
@@ -32,11 +34,14 @@ public class XMind2008Importer extends MindMapImporter {
     }
 
     public void build() throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ImportFromXMind2008Count"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_IMPORT,
+                UserDataConstants.IMPORT_FROM_X_MIND2008);
         try {
             IStorage storage = createStorage();
             try {
+                Core.getWorkbookBuilder().setEntryStreamNormalizer(
+                        new LazyPasswordBasedEncryptor());
                 IWorkbook sourceWorkbook = Core.getWorkbookBuilder()
                         .loadFromPath(getSourcePath(), storage, null);
 

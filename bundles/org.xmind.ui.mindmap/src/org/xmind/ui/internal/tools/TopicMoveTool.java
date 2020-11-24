@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -382,8 +382,13 @@ public class TopicMoveTool extends DummyMoveTool implements IStatusListener {
     }
 
     private IBranchPart updateTargetParent() {
-        if (isFloatMove())
+        ITopicPart topicPart = getSourceParentTopic();
+        ITopic topic = null;
+        if (topicPart != null)
+            topic = topicPart.getTopic();
+        if (isFloatMove() && topic != null)
             return null;
+
         if (isSpecialFreeMove() && specialTargetPart instanceof IBranchPart) {
             return (IBranchPart) specialTargetPart;
         }
@@ -465,8 +470,15 @@ public class TopicMoveTool extends DummyMoveTool implements IStatusListener {
     }
 
     private boolean isFreeMove() {
-        if (isFreeMovePattern())
+        if (isFreeMovePattern()) {
+            ITopicPart topicPart = getSourceParentTopic();
+            ITopic topic = null;
+            if (topicPart != null)
+                topic = topicPart.getTopic();
+            if (isFloatMove() && topic == null)
+                return false;
             return true;
+        }
         if (isSpecialFreeMove())
             return true;
         if (Util.isMac())
@@ -480,7 +492,7 @@ public class TopicMoveTool extends DummyMoveTool implements IStatusListener {
         if (topicPart != null)
             topic = topicPart.getTopic();
 
-        return topic == null ? getStatus().isStatus(GEF.ST_FREE_MOVE_MODE)
+        return topic == null ? (getStatus().isStatus(GEF.ST_FREE_MOVE_MODE))
                 : getStatus().isStatus(GEF.ST_FREE_MOVE_MODE) && topic.isRoot();
     }
 

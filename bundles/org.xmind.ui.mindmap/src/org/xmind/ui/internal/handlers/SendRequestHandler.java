@@ -9,9 +9,11 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.EditDomain;
 import org.xmind.gef.IViewer;
 import org.xmind.ui.internal.MindMapUIPlugin;
+import org.xmind.ui.mindmap.MindMapUI;
 
 public abstract class SendRequestHandler extends AbstractHandler
         implements IExecutableExtension {
@@ -85,9 +87,15 @@ public abstract class SendRequestHandler extends AbstractHandler
     private void collectUsage() {
         if (requestType == null)
             return;
-        if ("create_callout".equals(requestType)) {
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("InsertCalloutCount"); //$NON-NLS-1$
+
+        if (MindMapUI.REQ_CREATE_CALLOUT.equals(requestType)) {
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_INSERT,
+                    UserDataConstants.INSERT_CALLOUT);
+        } else if (MindMapUI.REQ_CREATE_RELATIONSHIP.equals(requestType)) {
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_INSERT,
+                    UserDataConstants.INSERT_RELATIONSHIP);
         }
     }
 

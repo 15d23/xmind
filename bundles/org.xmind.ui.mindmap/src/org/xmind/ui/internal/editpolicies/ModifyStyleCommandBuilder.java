@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -55,8 +55,8 @@ public class ModifyStyleCommandBuilder extends CommandBuilder {
     private List<IStyled> sources = new ArrayList<IStyled>();
 
     public ModifyStyleCommandBuilder(Request request) {
-        this(request.getTargetViewer(), request.getTargetDomain()
-                .getCommandStack(), request);
+        this(request.getTargetViewer(),
+                request.getTargetDomain().getCommandStack(), request);
     }
 
     public ModifyStyleCommandBuilder(IViewer viewer, CommandBuilder delegate,
@@ -65,8 +65,8 @@ public class ModifyStyleCommandBuilder extends CommandBuilder {
         init(request);
     }
 
-    public ModifyStyleCommandBuilder(IViewer viewer,
-            ICommandStack commandStack, Request request) {
+    public ModifyStyleCommandBuilder(IViewer viewer, ICommandStack commandStack,
+            Request request) {
         super(viewer, commandStack);
         init(request);
     }
@@ -122,7 +122,7 @@ public class ModifyStyleCommandBuilder extends CommandBuilder {
     }
 
     private void modifyStyle(IStyled source, String newStyleId) {
-        if (NULL.equals(newStyleId))
+        if (newStyleId != null && newStyleId.startsWith(NULL))
             newStyleId = null;
         add(new ModifyStyleCommand(source, newStyleId), true);
     }
@@ -145,8 +145,8 @@ public class ModifyStyleCommandBuilder extends CommandBuilder {
         if (styleSheet == null)
             return null;
 
-        IStyle oldStyle = sourceStyleId == null ? null : styleSheet
-                .findStyle(sourceStyleId);
+        IStyle oldStyle = sourceStyleId == null ? null
+                : styleSheet.findStyle(sourceStyleId);
         Properties oldProperties = getProperties(oldStyle);
         if (oldProperties == null) {
             oldProperties = new Properties();
@@ -188,8 +188,8 @@ public class ModifyStyleCommandBuilder extends CommandBuilder {
         }
         for (String name : request.getParameterNames()) {
             if (name.startsWith(MindMapUI.PARAM_STYLE_PREFIX)) {
-                String key = name.substring(MindMapUI.PARAM_STYLE_PREFIX
-                        .length());
+                String key = name
+                        .substring(MindMapUI.PARAM_STYLE_PREFIX.length());
                 String value = (String) request.getParameter(name);
                 value = evaluate(source, key, value);
                 if (value == null) {

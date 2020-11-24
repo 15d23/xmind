@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -23,8 +23,10 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.KeyManagementException;
@@ -51,6 +53,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.osgi.util.NLS;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -301,6 +304,8 @@ public class HttpRequest {
 
     private IResponseHandler responseHandler;
 
+    private IFinishHandler finishHandler;
+
     private int statusCode;
 
     private String statusMessage;
@@ -385,6 +390,18 @@ public class HttpRequest {
         return responseHandler;
     }
 
+    public void setFinishHandler(IFinishHandler finishHandler) {
+        this.finishHandler = finishHandler;
+    }
+
+    public IFinishHandler getFinishHandler() {
+        return finishHandler;
+    }
+
+    public byte[] getResponseBuffer() {
+        return responseBuffer;
+    }
+
     public String getResponseAsString() {
         if (responseBuffer == null)
             return null;
@@ -400,6 +417,32 @@ public class HttpRequest {
         } catch (JSONException e) {
             // not a valid JSON object
             return null;
+        } finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    public JSONObject getResponseAsJSONChecked()
+            throws InvalidResponseValueException {
+        if (responseBuffer == null)
+            throw new InvalidResponseValueException("No response buffer.");
+        ByteArrayInputStream input = new ByteArrayInputStream(responseBuffer);
+        try {
+            return new JSONObject(new JSONTokener(input));
+        } catch (JSONException e) {
+            // not a valid JSON object
+            try {
+                throw new InvalidResponseValueException(
+                        NLS.bind("Illegal reponse JSON:\n{0}",
+                                new String(responseBuffer, "utf-8"))); //$NON-NLS-1$
+            } catch (UnsupportedEncodingException e1) {
+                throw new InvalidResponseValueException(
+                        "Illegal reponse JSON.");
+            }
+
         } finally {
             try {
                 input.close();
@@ -501,47 +544,71 @@ public class HttpRequest {
         if (monitor.isCanceled())
             throw new InterruptedException();
 
-        int connectTimeout = settings.getInt(SETTING_CONNECT_TIMEOUT, -1);
-        if (connectTimeout >= 0) {
-            connection.setConnectTimeout(connectTimeout);
-        }
-        int readTimeout = settings.getInt(SETTING_READ_TIMEOUT, -1);
-        if (readTimeout >= 0) {
-            connection.setReadTimeout(readTimeout);
-        }
-
         log("Sending...."); //$NON-NLS-1$
         setStatusCode(HTTP_SENDING, "Sending"); //$NON-NLS-1$
         if (monitor.isCanceled())
             throw new InterruptedException();
 
         try {
-            connection.setDoOutput(requestEntity != null);
-            if (monitor.isCanceled())
-                throw new InterruptedException();
+            while (true) {
+                int connectTimeout = settings.getInt(SETTING_CONNECT_TIMEOUT,
+                        -1);
+                if (connectTimeout >= 0) {
+                    connection.setConnectTimeout(connectTimeout);
+                }
 
-            connection.setRequestMethod(method);
-            if (monitor.isCanceled())
-                throw new InterruptedException();
+                int readTimeout = settings.getInt(SETTING_READ_TIMEOUT, -1);
+                if (readTimeout >= 0) {
+                    connection.setReadTimeout(readTimeout);
+                }
 
-            writeHeaders(connection);
-            if (monitor.isCanceled())
-                throw new InterruptedException();
+                /// connection auto redirect don't have needed params
+                connection.setInstanceFollowRedirects(false);
 
-            writeBody(monitor, connection);
-            if (monitor.isCanceled())
-                throw new InterruptedException();
+                connection.setDoOutput(requestEntity != null);
+                if (monitor.isCanceled())
+                    throw new InterruptedException();
 
-            log("Waiting..."); //$NON-NLS-1$
-            setStatusCode(HTTP_WAITING, "Waiting"); //$NON-NLS-1$
-            if (monitor.isCanceled())
-                throw new InterruptedException();
+                connection.setRequestMethod(method);
+                if (monitor.isCanceled())
+                    throw new InterruptedException();
+
+                writeHeaders(connection);
+                if (monitor.isCanceled())
+                    throw new InterruptedException();
+
+                writeBody(monitor, connection);
+                if (monitor.isCanceled())
+                    throw new InterruptedException();
+
+                log("Waiting..."); //$NON-NLS-1$
+                setStatusCode(HTTP_WAITING, "Waiting"); //$NON-NLS-1$
+                if (monitor.isCanceled())
+                    throw new InterruptedException();
+
+                /// auto redirect
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HTTP_MOVED_PERM
+                        || responseCode == HTTP_MOVED_TEMP) {
+                    String newLocation = connection.getHeaderField("Location"); //$NON-NLS-1$
+                    connection = (HttpURLConnection) new URL(newLocation)
+                            .openConnection();
+                    _connection[0] = connection;
+
+                    if (monitor.isCanceled())
+                        throw new InterruptedException();
+                } else {
+                    break;
+                }
+            }
 
             readResponse(monitor, connection, connection.getInputStream(),
                     connection.getResponseCode(),
                     connection.getResponseMessage());
             if (monitor.isCanceled())
                 throw new InterruptedException();
+        } catch (SocketTimeoutException e) {
+            throw e;
         } catch (IOException e) {
             InputStream errorStream = connection.getErrorStream();
             if (errorStream == null) {
@@ -549,7 +616,6 @@ public class HttpRequest {
                 log("Error stream is NULL, response state: {0} {1}", //$NON-NLS-1$
                         connection.getResponseCode(),
                         connection.getResponseMessage());
-                throw new InterruptedException();
             } else {
                 readResponse(monitor, connection, errorStream,
                         connection.getResponseCode(),
@@ -682,7 +748,7 @@ public class HttpRequest {
 
         log("Receiving {0} bytes...", totalBytes); //$NON-NLS-1$
 
-        if (totalBytes > 0) {
+        if (totalBytes >= 0) {
             if (readStream == null)
                 throw new IOException(
                         "No input stream available to read response from"); //$NON-NLS-1$
@@ -726,6 +792,14 @@ public class HttpRequest {
         }
 
         log("Handled."); //$NON-NLS-1$
+
+        if (finishHandler != null) {
+            try {
+                finishHandler.handleRequestFinished(monitor, this);
+            } catch (OperationCanceledException e) {
+                throw new InterruptedException();
+            }
+        }
     }
 
     private long getResponseLength(InputStream readStream) throws IOException {
@@ -736,9 +810,6 @@ public class HttpRequest {
                 totalBytes = Long.parseLong(length, 10);
             } catch (NumberFormatException e) {
             }
-        }
-        if (totalBytes < 0 && readStream != null) {
-            totalBytes = readStream.available();
         }
         return totalBytes;
     }

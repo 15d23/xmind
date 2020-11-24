@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -70,7 +70,8 @@ public class Perspective implements IPerspectiveFactory {
                 Object partStack = partStackField.get(rightLayout);
                 partStackField.setAccessible(oldAccessible);
                 if (partStack instanceof MPartStack) {
-                    ((MPartStack) partStack).getTags().add("RightStack"); //$NON-NLS-1$
+                    ((MPartStack) partStack).getTags()
+                            .add(IModelConstants.TAG_X_STACK);
                 }
             } catch (SecurityException e) {
                 e.printStackTrace();
@@ -80,7 +81,7 @@ public class Perspective implements IPerspectiveFactory {
                 e.printStackTrace();
             }
         }
-        rightLayout.addView(IModelConstants.PART_ID_PROPERTIES);
+//        rightLayout.addView(IModelConstants.PART_ID_PROPERTIES);
 
 //        rightLayout.addPlaceholder(OUTLINE_VIEW_ID);
 //        rightLayout.addPlaceholder(MindMapUI.VIEW_MARKER);

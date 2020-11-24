@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -41,6 +41,7 @@ import org.xmind.core.INumbering;
 import org.xmind.core.ITopic;
 import org.xmind.core.event.CoreEvent;
 import org.xmind.core.event.ICoreEventRegister;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.Request;
 import org.xmind.gef.draw2d.graphics.GraphicsUtils;
 import org.xmind.ui.internal.MindMapMessages;
@@ -109,9 +110,10 @@ public class NumberingPropertySectionPart
             Object o = ((IStructuredSelection) event.getSelection())
                     .getFirstElement();
             if (o instanceof INumberFormatDescriptor) {
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase("NumberingTypeCount:" //$NON-NLS-1$
-                                + ((INumberFormatDescriptor) o).getId());
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_FORMAT,
+                        String.format(UserDataConstants.NUMBERING_TYPE_S,
+                                ((INumberFormatDescriptor) o).getId()));
                 changeNumberFormat(((INumberFormatDescriptor) o).getId());
             }
         }
@@ -150,8 +152,9 @@ public class NumberingPropertySectionPart
             if (INHERIT == o) {
                 changeNumberDepth(null);
             } else if (o instanceof String) {
-                MindMapUIPlugin.getDefault().getUsageDataCollector()
-                        .increase("NumberDepthCount" + o); //$NON-NLS-1$
+                MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                        UserDataConstants.CATEGORY_FORMAT,
+                        String.format(UserDataConstants.NUMBERING_DEPTH_S, o));
                 changeNumberDepth((String) o);
             }
         }

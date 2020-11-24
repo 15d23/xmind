@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -104,7 +104,7 @@ public class AlphaGraphics extends Graphics implements IUseTransparency {
             localFgPattern = new GradientPattern(gp.getDevice(), gp.x1, gp.y1,
                     gp.x2, gp.y2, gp.color1, getWorkingAlpha(gp.alpha1),
                     gp.color2, getWorkingAlpha(gp.alpha2));
-            delegate.setBackgroundPattern(localFgPattern);
+            delegate.setForegroundPattern(localFgPattern);
         } else {
             delegate.setForegroundPattern(pattern);
         }

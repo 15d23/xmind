@@ -5,15 +5,13 @@
  * License (EPL), which is available at
  * http://www.eclipse.org/legal/epl-v10.html and the GNU Lesser General Public
  * License (LGPL), which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details. Contributors: XMind Ltd. -
+ * See https://www.xmind.net/license.html for details. Contributors: XMind Ltd. -
  * initial API and implementation
  *******************************************************************************/
 package org.xmind.gef.draw2d;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -101,7 +99,7 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
     private PrecisionDimension nonRotatedPrefSize = null;
     private PrecisionInsets rotatedInsets = null;
     private int cachedWidthHint = -1;
-    private static Map<String, Integer> textToLabelWidth = new HashMap<String, Integer>();
+    private boolean showTabToSpace = false;
 
     private PrecisionRotator rotator = new PrecisionRotator();
 
@@ -112,7 +110,6 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
     }
 
     public RotatableWrapLabel(String text) {
-        setCachedPrefWidth(text);
         setText(text);
     }
 
@@ -121,7 +118,6 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
     }
 
     public RotatableWrapLabel(String text, int renderStyle) {
-        setCachedPrefWidth(text);
         setText(text);
         this.renderStyle = renderStyle;
     }
@@ -200,6 +196,17 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
      */
     public String getText() {
         return text;
+    }
+
+    public void setShowTabToSpace(boolean showTabToSpace) {
+        this.showTabToSpace = showTabToSpace;
+    }
+
+    private String getShowText() {
+        if (showTabToSpace) {
+            return getText() == null ? null : getText().replace("\t", " "); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return getText();
     }
 
     /**
@@ -363,7 +370,7 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
             wHint = Math.max(0, wHint - getInsets().getWidth());
         }
         receiveWidthCaches(wHint);
-        if (getText().length() == 0)
+        if (getShowText().length() == 0)
             return NO_TEXT_SIZE;
         if (cachedPrefSize == null) {
             cachedPrefSize = calculateRotatedPreferredSize(wHint, hHint)
@@ -421,7 +428,7 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
      * @return
      */
     protected String calculateAppliedText(double wHint) {
-        String theText = getText();
+        String theText = getShowText();
         if (wHint < 0 || theText.length() == 0)
             return theText;
 
@@ -478,19 +485,32 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
     private String getAbbreviatedText(String theText, Font f, double wHint) {
         String result = theText;
         int textLength = result.length();
+
         if (wHint > 0 && textLength > 0) {
-            textToLabelWidth.put(text, (int) wHint);
-            int textWidth = getLooseTextSize(result, f).width;
-            if (textWidth > wHint) {
-                int tructionPosition = (int) ((double) result.length()
-                        / (double) (textWidth) * (int) wHint);
-                if (tructionPosition < textLength)
-                    if (tructionPosition > ELLIPSE.length()) {
-                        tructionPosition -= ELLIPSE.length();
+            int tructionPosition = textLength;
+
+            while (true) {
+                int textWidth = getLooseTextSize(result, f).width;
+                if (textWidth > wHint) {
+                    tructionPosition = (int) ((double) result.length()
+                            / (double) (textWidth) * (int) wHint);
+
+                    if (tructionPosition < textLength && tructionPosition > 0) {
+                        result = result.substring(0, tructionPosition);
+                        continue;
                     }
+                }
+                break;
+            }
+
+            if (tructionPosition < textLength) {
+                if (tructionPosition > ELLIPSE.length()) {
+                    tructionPosition -= ELLIPSE.length();
+                }
                 return result.substring(0, tructionPosition) + ELLIPSE;
             }
         }
+
         return result;
     }
 
@@ -944,7 +964,36 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
     }
 
     protected boolean isNormalRenderStyle() {
-        return renderStyle == NORMAL;
+        /// some fonts don't show correctly when use graphics.drawText(), so render it by path.
+        boolean shownWrong = false;
+        String fontName = null;
+        if (getFont() != null) {
+            fontName = (getFont().getFontData())[0].getName();
+        }
+
+        String[] wrongFontNames = { "Cambria Math", "Gabriola", "Javanese Text", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                "Lucida Sans Unicode", "Microsoft Himalaya", "MV Boli", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                "Myanmar Text", "Segoe MDL2 Assets" }; //$NON-NLS-1$ //$NON-NLS-2$
+        String[] wrongFontPrefixs = { "Sitka" }; //$NON-NLS-1$
+
+        if (fontName != null) {
+            for (String name : wrongFontNames) {
+                if (fontName.equals(name)) {
+                    shownWrong = true;
+                    break;
+                }
+            }
+            if (!shownWrong) {
+                for (String prefix : wrongFontPrefixs) {
+                    if (fontName.startsWith(prefix)) {
+                        shownWrong = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return renderStyle == NORMAL && !shownWrong;
     }
 
     /**
@@ -963,12 +1012,6 @@ public class RotatableWrapLabel extends Figure implements ITextFigure,
 
     public String toString() {
         return "RotatableWrapLabl (" + getText() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
-    private void setCachedPrefWidth(String text) {
-        Integer cached = textToLabelWidth.get(text);
-        if (cached != null)
-            this.prefWidth = cached;
     }
 
 }

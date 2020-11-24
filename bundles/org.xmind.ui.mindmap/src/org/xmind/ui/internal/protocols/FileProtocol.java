@@ -11,6 +11,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -19,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.xmind.core.IWorkbook;
 import org.xmind.ui.internal.MindMapMessages;
 import org.xmind.ui.internal.editor.MME;
+import org.xmind.ui.mindmap.IHyperlinked;
 import org.xmind.ui.mindmap.IMindMapImages;
 import org.xmind.ui.mindmap.IProtocol;
 import org.xmind.ui.mindmap.MindMapUI;
@@ -26,7 +28,7 @@ import org.xmind.ui.util.MindMapUtils;
 
 public class FileProtocol implements IProtocol {
 
-    private static class OpenFileAction extends Action {
+    private static class OpenFileAction extends Action implements IHyperlinked {
 
         private IWorkbenchWindow window;
 
@@ -41,6 +43,10 @@ public class FileProtocol implements IProtocol {
             MME.launch(window, path, new File(path).getName());
         }
 
+        @Override
+        public String getHyperlink() {
+            return path;
+        }
     }
 
     public FileProtocol() {
@@ -98,8 +104,18 @@ public class FileProtocol implements IProtocol {
     }
 
     private static URI getFileURIFrom(IWorkbook workbook) {
-        IWorkbenchPage[] pages = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getPages();
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+        if (window == null) {
+            IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+            if (windows != null && windows.length != 0) {
+                window = windows[0];
+            }
+        }
+        if (window == null) {
+            return null;
+        }
+        IWorkbenchPage[] pages = window.getPages();
         for (IWorkbenchPage wp : pages) {
             IEditorReference[] ers = wp.getEditorReferences();
             for (IEditorReference er : ers) {

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IPageChangedListener;
@@ -47,6 +48,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.xmind.gef.EditDomain;
@@ -523,16 +525,17 @@ public abstract class GraphicalEditor extends EditorPart
 
     @SuppressWarnings("unchecked")
     public <T> T getAdapter(Class<T> adapter) {
+        T result = getEditorAdapter(adapter);
+        if (result != null) {
+            return result;
+        }
+
         Object activePage = getSelectedPage();
         if (activePage != null) {
-            T result = GEFPlugin.getAdapter(activePage, adapter);
+            result = GEFPlugin.getAdapter(activePage, adapter);
             if (result != null)
                 return result;
         }
-
-        T result = getEditorAdapter(adapter);
-        if (result != null)
-            return result;
 
         return super.getAdapter(adapter);
     }
@@ -765,9 +768,27 @@ public abstract class GraphicalEditor extends EditorPart
             pagePopupMenu = null;
         }
 
-        if (commandStack != null && !commandStack.isDisposed()) {
-            disposeCommandStack(commandStack);
+        if (miniBar != null) {
+            IToolBarManager toolBarManager = miniBar.getToolBarManager();
+            if (toolBarManager instanceof ToolBarManager) {
+                ((ToolBarManager) toolBarManager).dispose();
+            }
+            miniBar = null;
+        }
+
+        if (miniBarContributor != null) {
+            miniBarContributor.dispose();
+            miniBarContributor = null;
+        }
+
+        if (commandStack != null) {
+            if (!commandStack.isDisposed())
+                disposeCommandStack(commandStack);
             commandStack = null;
+        }
+        IWorkbenchPartSite site = getSite();
+        if (site != null) {
+            site.setSelectionProvider(null);
         }
         disposePages();
         super.dispose();

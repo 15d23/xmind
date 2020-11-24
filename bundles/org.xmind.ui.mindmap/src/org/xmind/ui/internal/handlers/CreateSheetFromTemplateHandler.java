@@ -18,17 +18,18 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.progress.IProgressService;
 import org.xmind.core.ISheet;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.command.Command;
 import org.xmind.gef.command.CompoundCommand;
 import org.xmind.gef.command.ICommandStack;
 import org.xmind.ui.commands.AddSheetCommand;
 import org.xmind.ui.internal.MindMapMessages;
+import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.internal.dialogs.NewSheetFromTemplateDialog;
 import org.xmind.ui.mindmap.ITemplate;
 import org.xmind.ui.mindmap.IWorkbookRef;
 
 /**
- * 
  * @author Frank Shaka
  * @since 3.6.50
  */
@@ -55,7 +56,18 @@ public class CreateSheetFromTemplateHandler extends AbstractHandler {
         if (dialog.open() != NewSheetFromTemplateDialog.OK)
             return;
 
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_SHEET,
+                UserDataConstants.CREATE_SHEET);
+        MindMapUIPlugin.getDefault().getUsageDataCollector()
+                .trackView(UserDataConstants.VIEW_TEMPLATES);
+
         final ITemplate template = dialog.getTemplate();
+
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_TEMPLATE,
+                String.format(UserDataConstants.USE_TEMPLATE_S,
+                        template.getName().replaceAll(" ", "_"))); //$NON-NLS-1$ //$NON-NLS-2$
         Assert.isTrue(template != null);
         final IWorkbookRef tempWorkbookRef = template.createWorkbookRef();
         if (tempWorkbookRef == null)
@@ -106,7 +118,7 @@ public class CreateSheetFromTemplateHandler extends AbstractHandler {
     private void createCommands(IProgressMonitor monitor,
             List<Command> commands, IWorkbookRef tempWorkbookRef,
             IWorkbook targetWorkbook)
-                    throws InterruptedException, InvocationTargetException {
+            throws InterruptedException, InvocationTargetException {
         SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 
         tempWorkbookRef.open(subMonitor.newChild(50));

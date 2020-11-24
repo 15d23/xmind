@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -29,6 +29,7 @@ import org.xmind.core.Core;
 import org.xmind.core.ILegend;
 import org.xmind.core.ISheet;
 import org.xmind.core.event.ICoreEventRegister;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.gef.Request;
 import org.xmind.ui.color.ColorPicker;
 import org.xmind.ui.color.IColorSelection;
@@ -44,8 +45,9 @@ public class LegendPropertySectionPart extends StyledPropertySectionPart {
     private class BackgroundColorOpenListener implements IOpenListener {
 
         public void open(OpenEvent event) {
-            MindMapUIPlugin.getDefault().getUsageDataCollector()
-                    .increase("ChangeLegendBackgroudCount"); //$NON-NLS-1$
+            MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_FORMAT,
+                    UserDataConstants.CHANGE_LEGEND_BACKGROUND);
             changeBackgroundColor((IColorSelection) event.getSelection());
         }
 

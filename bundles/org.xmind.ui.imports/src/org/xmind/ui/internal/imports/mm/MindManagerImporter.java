@@ -5,7 +5,7 @@
  * under the Eclipse Public License (EPL), which is available at
  * http://www.eclipse.org/legal/epl-v10.html and the GNU Lesser General Public
  * License (LGPL), which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors: XMind Ltd. - initial API and implementation
  */
@@ -60,6 +60,7 @@ import org.xmind.core.ITopicExtension;
 import org.xmind.core.ITopicExtensionElement;
 import org.xmind.core.ITopicRange;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.internal.dom.NumberUtils;
 import org.xmind.core.internal.dom.StyleSheetImpl;
 import org.xmind.core.io.DirectoryStorage;
@@ -359,8 +360,9 @@ public class MindManagerImporter extends MindMapImporter
     }
 
     public void build() throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ImportFromMindManagerCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_IMPORT,
+                UserDataConstants.IMPORT_FROM_MIND_MANAGER);
         getMonitor().beginTask(null, 100);
         try {
             getMonitor()
@@ -477,6 +479,7 @@ public class MindManagerImporter extends MindMapImporter
         checkInterrupted();
 
         targetSheet = getTargetWorkbook().createSheet();
+        targetSheet.setTitleText(getSuggestedSheetTitle());
 
         Element oneTopicEle = child(docEle, "OneTopic"); //$NON-NLS-1$
         if (oneTopicEle != null) {

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -28,7 +28,6 @@ import org.xmind.core.IWorkbook;
 import org.xmind.core.event.CoreEvent;
 import org.xmind.core.event.ICoreEventSource;
 import org.xmind.core.internal.security.PasswordProtectedNormalizer;
-import org.xmind.ui.internal.MindMapUIPlugin;
 
 /**
  * @author Frank Shaka
@@ -145,9 +144,6 @@ public class WorkbookRefEncryptable implements IEncryptable {
      */
     @Override
     public void setPassword(String newPassword) {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("TrigSetPasswordCount"); //$NON-NLS-1$
-
         IEntryStreamNormalizer oldEncryptor = this.encryptor;
         IEntryStreamNormalizer newEncryptor = createEncryptor(newPassword);
         if (encryptorEquals(oldEncryptor, newEncryptor))
@@ -171,16 +167,10 @@ public class WorkbookRefEncryptable implements IEncryptable {
 
     @Override
     public void setPasswordHint(String passwordHint) {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("TrigSetPasswordHintCount"); //$NON-NLS-1$
-
         this.passwordHint = passwordHint;
     }
 
     public String getPasswordHint() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("TrigGetPasswordHintCount"); //$NON-NLS-1$
-
         return passwordHint;
     }
 

@@ -1,6 +1,7 @@
 package org.xmind.ui.internal.actions;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.internal.MindMapMessages;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.prefs.PrefConstants;
@@ -16,8 +17,9 @@ public class AllowManualLayoutAction extends BooleanPrefAction {
 
     @Override
     public void run() {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("AllowFreePositionCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_MODIFY,
+                UserDataConstants.ALLOW_FREE_POSITION);
         super.run();
     }
 

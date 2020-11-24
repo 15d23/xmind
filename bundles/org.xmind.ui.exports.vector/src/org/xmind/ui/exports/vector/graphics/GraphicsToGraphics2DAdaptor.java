@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -176,6 +176,8 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
     private Stack<State> states = new Stack<State>();
     private final State currentState = new State();
     private final State appliedState = new State();
+
+    private double[] flatMatrixState;
 
     /**
      * Some strings, Asian string in particular, are painted differently between
@@ -957,11 +959,13 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
     @Override
     public void pushState() {
         swtGraphics.pushState();
-        if (angle != 0) {
-            getGraphics2D().rotate(Math.toRadians(360 - angle), rotateX,
-                    rotateY);
-            angle = 0;
-        }
+//        if (angle != 0) {
+//            getGraphics2D().rotate(Math.toRadians(360 - angle), rotateX,
+//                    rotateY);
+//            angle = 0;
+//        }
+        flatMatrixState = new double[6];
+        getGraphics2D().getTransform().getMatrix(flatMatrixState);
 
         // Make a copy of the current state and push it onto the stack
         State toPush = new State();
@@ -1004,6 +1008,9 @@ public class GraphicsToGraphics2DAdaptor extends Graphics {
         currentState.font = state.font;
         currentState.alpha = state.alpha;
 
+        if (flatMatrixState != null) {
+            getGraphics2D().setTransform(new AffineTransform(flatMatrixState));
+        }
     }
 
     /*

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.xmind.core.ISheet;
 import org.xmind.core.ITopic;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.internal.MindMapUIPlugin;
 import org.xmind.ui.mindmap.IMindMap;
 import org.xmind.ui.mindmap.IMindMapImages;
@@ -104,7 +105,6 @@ public class HtmlExportWizard extends DocumentExportWizard {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.xmind.ui.wizards.DocumentExportWizard#doExport(org.eclipse.core.
      * runtime.IProgressMonitor, org.eclipse.swt.widgets.Display,
      * org.eclipse.swt.widgets.Shell)
@@ -112,9 +112,10 @@ public class HtmlExportWizard extends DocumentExportWizard {
     @Override
     protected void doExport(IProgressMonitor monitor, Display display,
             Shell parentShell)
-                    throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ExportToHtmlCount"); //$NON-NLS-1$
+            throws InvocationTargetException, InterruptedException {
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_EXPORT,
+                UserDataConstants.EXPORT_TO_HTML);
         super.doExport(monitor, display, parentShell);
     }
 

@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -48,7 +48,6 @@ import org.xmind.ui.mindmap.MindMapUI;
 import org.xmind.ui.util.MindMapUtils;
 
 /**
- * 
  * @author MANGOSOFT
  */
 public class SheetPart extends MindMapPartBase
@@ -201,7 +200,8 @@ public class SheetPart extends MindMapPartBase
             return true;
         String topicType = t.getType();
         if (!ITopic.ATTACHED.equals(topicType)
-                && !ITopic.SUMMARY.equals(topicType))
+                && !ITopic.SUMMARY.equals(topicType)
+                && !ITopic.CALLOUT.equals(topicType))
             return false;
         return isTopicVisible(parent, rootTopic);
     }
@@ -340,7 +340,6 @@ public class SheetPart extends MindMapPartBase
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.xmind.ui.internal.mindmap.MindMapPartBase#onActivated()
      */
     @Override
@@ -351,7 +350,6 @@ public class SheetPart extends MindMapPartBase
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.xmind.ui.internal.mindmap.MindMapPartBase#onDeactivated()
      */
     @Override
@@ -362,7 +360,6 @@ public class SheetPart extends MindMapPartBase
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.eclipse.swt.events.ControlListener#controlMoved(org.eclipse.swt.
      * events .ControlEvent)
      */
@@ -371,7 +368,6 @@ public class SheetPart extends MindMapPartBase
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.eclipse.swt.events.ControlListener#controlResized(org.eclipse.swt
      * .events.ControlEvent)

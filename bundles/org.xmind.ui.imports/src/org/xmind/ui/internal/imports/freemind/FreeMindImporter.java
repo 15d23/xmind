@@ -5,7 +5,7 @@
  * under the Eclipse Public License (EPL), which is available at
  * http://www.eclipse.org/legal/epl-v10.html and the GNU Lesser General Public
  * License (LGPL), which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors: XMind Ltd. - initial API and implementation
  */
@@ -44,6 +44,8 @@ import org.xmind.core.ISpan;
 import org.xmind.core.ITextSpan;
 import org.xmind.core.ITopic;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
+import org.xmind.core.internal.dom.StyleSheetImpl;
 import org.xmind.core.io.ResourceMappingManager;
 import org.xmind.core.io.freemind.FreeMindConstants;
 import org.xmind.core.io.freemind.FreeMindResourceMappingManager;
@@ -236,8 +238,9 @@ public class FreeMindImporter extends MindMapImporter
     }
 
     public void build() throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ImportFromFreeMindCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_IMPORT,
+                UserDataConstants.IMPORT_FROM_FREE_MIND);
         try {
             DocumentBuilder builder = getDocumentBuilder();
             builder.setErrorHandler(this);
@@ -302,7 +305,7 @@ public class FreeMindImporter extends MindMapImporter
     private void loadSheet(Element rootEle) throws InterruptedException {
         checkInterrupted();
         ISheet sheet = getTargetWorkbook().createSheet();
-        sheet.setTitleText("sheet1"); //$NON-NLS-1$
+        sheet.setTitleText(getSuggestedSheetTitle());
         Element nodeEle = child(rootEle, "node"); //$NON-NLS-1$
         if (nodeEle != null)
             loadTopic(sheet.getRootTopic(), nodeEle);
@@ -638,8 +641,11 @@ public class FreeMindImporter extends MindMapImporter
     }
 
     private IStyleSheet getStyleSheet() {
-        if (styleSheet == null)
+        if (styleSheet == null) {
             styleSheet = Core.getStyleSheetBuilder().createStyleSheet();
+            ((StyleSheetImpl) styleSheet)
+                    .setManifest(getTargetWorkbook().getManifest());
+        }
         return styleSheet;
     }
 

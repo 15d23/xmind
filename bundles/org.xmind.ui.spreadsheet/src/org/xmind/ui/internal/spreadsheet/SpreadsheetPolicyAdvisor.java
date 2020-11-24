@@ -6,13 +6,14 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
  *******************************************************************************/
 package org.xmind.ui.internal.spreadsheet;
 
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.branch.IBranchPolicy;
 import org.xmind.ui.branch.IBranchPolicyAdvisor;
 import org.xmind.ui.internal.MindMapUIPlugin;
@@ -29,8 +30,9 @@ public class SpreadsheetPolicyAdvisor implements IBranchPolicyAdvisor {
         for (IBranchPart child : branch.getSubBranches()) {
             child.getTopicPart().refresh();
         }
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("TrigSpreadSheetCount"); //$NON-NLS-1$
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_STRUCTURE,
+                UserDataConstants.USE_SPREAD_SHEET);
     }
 
     public void postDeactivate(IBranchPart branch, IBranchPolicy policy) {

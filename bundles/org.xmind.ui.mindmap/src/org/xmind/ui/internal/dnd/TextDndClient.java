@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -96,7 +96,7 @@ public class TextDndClient extends MindMapDNDClientBase {
     }
 
     private Object[] buildeTopics(String text, IWorkbook wb) {
-        String[] lines = text.split("\\r\\n|\\r|\\n"); //$NON-NLS-1$
+        String[] lines = text.split("\\r\\n|\\r|\\n|\u2028|\u2029"); //$NON-NLS-1$
         ArrayList<ITopic> topics = new ArrayList<ITopic>(lines.length);
         HashMap<ITopic, Integer> map = new HashMap<ITopic, Integer>();
         ITopic lastTopic = null;

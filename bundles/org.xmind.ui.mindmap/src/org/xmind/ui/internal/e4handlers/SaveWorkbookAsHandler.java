@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -199,14 +199,17 @@ public class SaveWorkbookAsHandler {
                         /// sort by priority
                         /// choose highest priority
                         /// exclude those whose priority < 0
-                        int priority = wizardDescriptor.getWizard()
-                                .getPriorityFor(context, options);
-                        if (priority > maxPriority) {
-                            maxPriority = priority;
-                            defaultWizard = wizardDescriptor;
+                        ISaveWizard wizard_0 = wizardDescriptor.getWizard();
+                        if (wizard_0 != null) {
+                            int priority = wizard_0.getPriorityFor(context,
+                                    options);
+                            if (priority > maxPriority) {
+                                maxPriority = priority;
+                                defaultWizard = wizardDescriptor;
+                            }
+                            if (priority < 0)
+                                wizards.remove(wizardDescriptor);
                         }
-                        if (priority < 0)
-                            wizards.remove(wizardDescriptor);
                     }
 
                 }

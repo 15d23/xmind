@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -109,8 +109,8 @@ public class SheetDecorator extends Decorator {
                     } else if (newKey instanceof String) {
                         ImageDescriptor entryKey = null;
                         try {
-                            entryKey = ImageDescriptor.createFromURL(new URL(
-                                    (String) newKey));
+                            entryKey = ImageDescriptor
+                                    .createFromURL(new URL((String) newKey));
                         } catch (MalformedURLException e) {
                             entryKey = ImageDescriptor
                                     .getMissingImageDescriptor();
@@ -133,8 +133,8 @@ public class SheetDecorator extends Decorator {
                     String attachmentPath = HyperlinkUtils
                             .toAttachmentPath(value);
                     IWorkbook workbook = getWorkbook(host);
-                    return AttachmentImageDescriptor.createFromEntryPath(
-                            workbook, attachmentPath);
+                    return AttachmentImageDescriptor
+                            .createFromEntryPath(workbook, attachmentPath);
                 } else if (HyperlinkUtils.isInternalAttachmentURL(value)) {
                     return value;
                 }
@@ -200,7 +200,9 @@ public class SheetDecorator extends Decorator {
 
     private void decorateBackground(IGraphicalPart part, IStyleSelector ss,
             Layer layer) {
-        layer.setBackgroundColor(getBackgroundColor(part, ss));
+        Color backgroundColor = getBackgroundColor(part, ss);
+        if (backgroundColor != null)
+            layer.setBackgroundColor(backgroundColor);
 
         if (layer instanceof BackgroundLayer) {
             BackgroundLayer bgLayer = (BackgroundLayer) layer;
@@ -251,8 +253,8 @@ public class SheetDecorator extends Decorator {
         }
         partToWrapImage.put(part, wrapImage);
 
-        return wrapImage == null ? null : new Pattern(Display.getCurrent(),
-                wrapImage);
+        return wrapImage == null ? null
+                : new Pattern(Display.getCurrent(), wrapImage);
     }
 
     private Image getWallpaperImage(IGraphicalPart part, IStyleSelector ss) {
@@ -271,7 +273,7 @@ public class SheetDecorator extends Decorator {
             }
             ((BackgroundLayer) layer).setWallpaper(null);
         }
-        Image wrapImage = partToWrapImage.get(part);
+        Image wrapImage = partToWrapImage.remove(part);
         if (wrapImage != null) {
             wrapImage.dispose();
             wrapImage = null;

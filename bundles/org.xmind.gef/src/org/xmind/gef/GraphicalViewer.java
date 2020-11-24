@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -15,20 +15,29 @@ package org.xmind.gef;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Layer;
 import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.RangeModel;
 import org.eclipse.draw2d.Viewport;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.GestureEvent;
+import org.eclipse.swt.events.GestureListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.xmind.gef.dnd.IDndSupport;
 import org.xmind.gef.event.PartsEventDispatcher;
 import org.xmind.gef.event.ViewerEventDispatcher;
@@ -185,8 +194,76 @@ public class GraphicalViewer extends AbstractViewer
             }
         };
 
+        addGestureZoomSupport(canvas);
+        addHorizontalScrollSupport(canvas);
         canvas.setViewport(viewport);
         return canvas;
+    }
+
+    private void addGestureZoomSupport(FigureCanvas canvas) {
+        final int FREQUENCY = 10;
+        final int[] eventCounts = new int[] { 8, 8 };
+        canvas.addGestureListener(new GestureListener() {
+
+            public void gesture(GestureEvent e) {
+                if (e.magnification > 1) {
+                    if (eventCounts[0] >= FREQUENCY) {
+                        eventCounts[0] = 0;
+                        sendRequest(GEF.REQ_ZOOMIN);
+                    } else {
+                        eventCounts[0]++;
+                    }
+                    eventCounts[1] = 8;
+                } else if (e.magnification > 0 && e.magnification < 1) {
+                    if (eventCounts[1] >= FREQUENCY) {
+                        eventCounts[1] = 0;
+                        sendRequest(GEF.REQ_ZOOMOUT);
+                    } else {
+                        eventCounts[1]++;
+                    }
+                    eventCounts[0] = 8;
+                }
+            }
+        });
+    }
+
+    private void sendRequest(final String reqType) {
+        if (getEditDomain() != null) {
+            SafeRunner.run(new SafeRunnable() {
+                public void run() throws Exception {
+                    getEditDomain().handleRequest(reqType,
+                            GraphicalViewer.this);
+                }
+            });
+        }
+    }
+
+    // add horizontal scroll support for windows
+    private void addHorizontalScrollSupport(final FigureCanvas canvas) {
+        if (Util.isWindows()) {
+            canvas.addListener(SWT.MouseHorizontalWheel, new Listener() {
+
+                public void handleEvent(Event event) {
+                    if (!canvas.isDisposed()) {
+                        int offset = -event.count;
+                        ScrollBar horizontalBar = getCanvas()
+                                .getHorizontalBar();
+
+                        if (horizontalBar != null) {
+                            horizontalBar.setSelection(
+                                    horizontalBar.getSelection() + offset
+                                            * horizontalBar.getIncrement());
+
+                            RangeModel model = getViewport()
+                                    .getHorizontalRangeModel();
+                            int hBarOffset = Math.max(0, -model.getMinimum());
+                            getCanvas().scrollToX(
+                                    horizontalBar.getSelection() - hBarOffset);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /*

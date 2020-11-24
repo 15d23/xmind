@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -61,6 +61,7 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.ui.IWordContext;
 import org.xmind.ui.IWordContextProvider;
 
@@ -495,8 +496,9 @@ public class SpellingCheckView extends ViewPart
 
             monitor.done();
 
-            SpellingPlugin.getDefault().getUsageDataCollector()
-                    .increase("SpellingCheckCount"); //$NON-NLS-1$
+            SpellingPlugin.getDefault().getUsageDataCollector().trackEvent(
+                    UserDataConstants.CATEGORY_SPELLING,
+                    UserDataConstants.CHECK_SPELLING);
 
             return Status.OK_STATUS;
         }

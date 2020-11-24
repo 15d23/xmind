@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.xmind.core.IWorkbook;
+import org.xmind.core.internal.UserDataConstants;
 import org.xmind.core.util.FileUtils;
 import org.xmind.gef.ui.editor.IGraphicalEditor;
 import org.xmind.ui.internal.MindMapUIPlugin;
@@ -58,7 +59,6 @@ public class XMind2008ExportWizard extends AbstractMindMapExportWizard {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt
          * .widgets.Composite)
@@ -77,7 +77,6 @@ public class XMind2008ExportWizard extends AbstractMindMapExportWizard {
 
         /*
          * (non-Javadoc)
-         * 
          * @see
          * org.xmind.ui.wizards.AbstractExportPage#setDialogFilters(org.eclipse
          * .swt.widgets.FileDialog, java.util.List, java.util.List)
@@ -106,7 +105,6 @@ public class XMind2008ExportWizard extends AbstractMindMapExportWizard {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.xmind.ui.wizards.AbstractMindMapExportWizard#setSourceEditor(org.
      * xmind.gef.ui.editor.IGraphicalEditor)
@@ -119,7 +117,6 @@ public class XMind2008ExportWizard extends AbstractMindMapExportWizard {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.xmind.ui.wizards.AbstractMindMapExportWizard#hasSource()
      */
     @Override
@@ -152,7 +149,6 @@ public class XMind2008ExportWizard extends AbstractMindMapExportWizard {
 
     /*
      * (non-Javadoc)
-     * 
      * @see
      * org.xmind.ui.wizards.AbstractMindMapExportWizard#doExport(org.eclipse
      * .core.runtime.IProgressMonitor, org.eclipse.swt.widgets.Display,
@@ -160,9 +156,10 @@ public class XMind2008ExportWizard extends AbstractMindMapExportWizard {
      */
     protected void doExport(IProgressMonitor monitor, Display display,
             Shell parentShell)
-                    throws InvocationTargetException, InterruptedException {
-        MindMapUIPlugin.getDefault().getUsageDataCollector()
-                .increase("ExportToXMind2008Count"); //$NON-NLS-1$
+            throws InvocationTargetException, InterruptedException {
+        MindMapUIPlugin.getDefault().getUsageDataCollector().trackEvent(
+                UserDataConstants.CATEGORY_EXPORT,
+                UserDataConstants.EXPORT_TO_X_MIND2008);
         XMind2008Exporter exporter = new XMind2008Exporter(sourceWorkbook,
                 getTargetPath());
         exporter.setMonitor(monitor);

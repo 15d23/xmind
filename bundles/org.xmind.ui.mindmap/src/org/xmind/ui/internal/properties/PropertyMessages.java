@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -30,6 +30,7 @@ public class PropertyMessages extends NLS {
     public static String LineWidth_None;
     public static String LineWidth_Thin;
     public static String LineWidth_Thinnest;
+    public static String SheetMultiBranchColorsStylePropertySectionPart_multiBranchColor_text;
     public static String ShowLegend_text;
     public static String ShowLegend_toolTip;
     public static String Structure_toolTip;

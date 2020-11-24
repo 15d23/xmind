@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL), 
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  * 
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -40,6 +40,7 @@ import static org.xmind.core.internal.dom.DOMConstants.TAG_SUMMARY;
 import static org.xmind.core.internal.dom.DOMConstants.TAG_TITLE;
 import static org.xmind.core.internal.dom.DOMConstants.TAG_TOPIC;
 import static org.xmind.core.internal.dom.DOMConstants.TAG_TOPICS;
+import static org.xmind.core.internal.dom.DOMConstants.TAG_ZCLASS;
 import static org.xmind.core.internal.dom.DOMConstants.VAL_FOLDED;
 import static org.xmind.core.internal.dom.NumberUtils.safeParseInt;
 
@@ -1359,6 +1360,18 @@ public class TopicImpl extends Topic implements ICoreEventSource {
         if (sheet != null) {
             ((SheetImpl) sheet).updateModificationInfo();
         }
+    }
+
+    public void setZClass(String zClass) {
+        String oldValue = getZClass();
+        DOMUtils.setAttribute(implementation, TAG_ZCLASS, zClass);
+        String newValue = getZClass();
+        fireValueChange(Core.ZClass, oldValue, newValue);
+        updateModificationInfo();
+    }
+
+    public String getZClass() {
+        return DOMUtils.getAttribute(implementation, TAG_ZCLASS);
     }
 
 }

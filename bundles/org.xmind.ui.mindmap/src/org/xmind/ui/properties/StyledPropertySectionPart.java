@@ -6,7 +6,7 @@
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  * and the GNU Lesser General Public License (LGPL),
  * which is available at http://www.gnu.org/licenses/lgpl.html
- * See http://www.xmind.net/license.html for details.
+ * See https://www.xmind.net/license.html for details.
  *
  * Contributors:
  *     XMind Ltd. - initial API and implementation
@@ -34,8 +34,8 @@ import org.xmind.ui.resources.ColorUtils;
 import org.xmind.ui.style.StyleUtils;
 import org.xmind.ui.style.Styles;
 
-public abstract class StyledPropertySectionPart extends
-        MindMapPropertySectionPartBase {
+public abstract class StyledPropertySectionPart
+        extends MindMapPropertySectionPartBase {
 
     protected String getStyleValue(String styleKey, String decorationId) {
         String value = null;
@@ -111,6 +111,10 @@ public abstract class StyledPropertySectionPart extends
 
     protected void updateColorPicker(ColorPicker picker, String styleKey,
             String decorationId) {
+        if (picker == null) {
+            return;
+        }
+
         String autoColor = getAutoValue(styleKey, decorationId);
         picker.setAutoColor(StyleUtils.convertRGB(styleKey, autoColor));
         String userColor = getUserValue(styleKey);
